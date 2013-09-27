@@ -18,7 +18,7 @@ int main( int argc, const char* argv[] )
 	{
 		std::cerr << " Please provide a problem data file " << std::endl ;
 		std::cerr << " Syntax: " << argv[0] << " dataFile "
-				  << " [ deterministic ] [ tol ] [ maxIters ] [ staticPb ] [ regul ] [ useInfNorm ] [useProjectGradient] [cadouxIterations]"
+				  << " [ maxThreads ] [ tol ] [ maxIters ] [ staticPb ] [ regul ] [ useInfNorm ] [useProjectedGradient] [cadouxIterations]"
 				  << std::endl ;
 		return 1 ;
 	}

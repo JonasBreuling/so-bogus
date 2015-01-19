@@ -72,7 +72,7 @@ template < typename BlockMatrixType >
 template < typename NSLaw,  typename RhsT, typename ResT >
 void GaussSeidel< BlockMatrixType >::innerLoop(
 		bool parallelize, const NSLaw &law, const RhsT& b,
-		std::vector< unsigned char > &skip, Scalar &ndxRef,
+		const Scalar ss, std::vector< unsigned char > &skip, Scalar &ndxRef,
 		ResT &x	) const
 {
 	typedef typename NSLaw::Traits LocalProblemTraits ;
@@ -118,6 +118,7 @@ void GaussSeidel< BlockMatrixType >::innerLoop(
 				ldx += lx ;
 
 				if( !ok ) { ldx *= .5 ; }
+                                ldx *= ss ;
 				xSegmenter[ i ] += ldx ;
 
 				const Scalar nx2 = m_scaling[ i ] * m_scaling[ i ] * lx.squaredNorm() ;
@@ -141,7 +142,6 @@ void GaussSeidel< BlockMatrixType >::innerLoop(
 #endif
 
 }
-
 
 
 template < typename BlockMatrixType >
@@ -208,11 +208,12 @@ GaussSeidel< BlockMatrixType >::solveWithLinearConstraints( const NSLaw &law,
 	std::vector< unsigned char > skip( n, 0 ) ;
 	Scalar ndxRef = 0 ; //Reference step size
 
+        double ss = 1. ;
 	unsigned GSIter ;
 	for( GSIter = 1 ; GSIter <= m_maxIters ; ++GSIter )
 	{
 
-		innerLoop( parallelize, law, w, skip, ndxRef, x ) ;
+		innerLoop( parallelize, law, w, ss, skip, ndxRef, x ) ;
 
 		if( solveEvery > 0 && 0 == ( GSIter % solveEvery ) )
 		{
@@ -232,6 +233,9 @@ GaussSeidel< BlockMatrixType >::solveWithLinearConstraints( const NSLaw &law,
 			{
 				break ;
 			}
+
+
+                        if( err > 1.e2 * err_best ) { x = x_best ; ss /= 10 ; }
 
 			ndxRef /= m_evalEvery ;
 		}

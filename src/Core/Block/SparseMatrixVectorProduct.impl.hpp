@@ -99,6 +99,22 @@ struct SparseBlockMatrixVectorMultiplier
 
 } ;
 
+template <typename T>
+inline void sum_reduce( T* begin, T* end )
+{
+	for( int n = end - begin, stride = 1 ; n > 1 ; n=(n+1)/2, stride*=2 )
+	{
+		const int pairs = n/2 ;
+#pragma omp for
+		for( int i = 0 ; i < pairs ; ++i )
+		{
+			T *a = begin + 2*i*stride ;
+			T *b = a + stride ;
+			*a += *b ;
+		}
+	}
+}
+
 //! Implementation for symmetric products
 template < bool NativeOrder, bool Transpose >
 struct SparseBlockMatrixVectorMultiplier< true, NativeOrder, Transpose >
@@ -113,15 +129,17 @@ struct SparseBlockMatrixVectorMultiplier< true, NativeOrder, Transpose >
 		typedef Segmenter< SegDim, const RhsT, typename Derived::Index > RhsSegmenter ;
 		const RhsSegmenter rhsSegmenter( rhs, matrix.majorIndex().innerOffsetsData() ) ;
 
-		const Lock& lock = matrix.lock();
-
 		typedef typename SparseBlockMatrixBase< Derived >::MajorIndexType MajorIndexType ;
+		LocalResT* temp_compute = new LocalResT[omp_get_max_threads()] ;
+
 #pragma omp parallel
 		{
-			LocalResT locRes( res.rows(), res.cols() ) ;
-			locRes.setZero() ;
+			const int tid = omp_get_thread_num() ;
 
-			ResSegmenter resSegmenter( locRes, matrix.minorIndex().innerOffsetsData() ) ;
+			resize(temp_compute[tid], res.rows(), res.cols()) ;
+			set_zero(temp_compute[tid]) ;
+
+			ResSegmenter resSegmenter( temp_compute[tid], matrix.minorIndex().innerOffsetsData() ) ;
 
 #pragma omp for
 			for( typename Derived::Index i = 0 ; i < matrix.majorIndex().outerSize() ; ++i )
@@ -140,11 +158,13 @@ struct SparseBlockMatrixVectorMultiplier< true, NativeOrder, Transpose >
 				}
 			}
 
-			{
-				Lock::Guard<> guard( lock ) ;
-				res += locRes ;
-			}
+			const int num_threads = omp_get_num_threads() ;
+			sum_reduce( temp_compute, temp_compute+num_threads ) ;
+
 		}
+		res += temp_compute[0] ;
+
+		delete[] temp_compute ;
 	}
 #endif
 
@@ -212,24 +232,26 @@ struct OutOfOrderSparseBlockMatrixVectorMultiplier
 		typedef Segmenter< RhsSegDim, const RhsT, Index > RhsSegmenter ;
 		const RhsSegmenter rhsSegmenter( rhs, matrix.minorIndex().innerOffsetsData() ) ;
 
-		const Lock& lock = matrix.lock();
+		LocalResT* temp_compute = new LocalResT[omp_get_max_threads()] ;
 
 #pragma omp parallel
 		{
-			LocalResT locRes( res.rows(), res.cols() ) ;
-			locRes.setZero() ;
+			const int tid = omp_get_thread_num() ;
+			resize(temp_compute[tid], res.rows(), res.cols()) ;
+			set_zero(temp_compute[tid]) ;
 
 #pragma omp for
 			for( Index i = 0 ; i < matrix.majorIndex().outerSize() ; ++i )
 			{
-				innerColMultiply< Transpose, typename Derived::BlockType >( matrix.blocks(), matrix.majorIndex(), i, rhsSegmenter[i], locRes, make_constant_array(alpha) ) ;
+				innerColMultiply< Transpose, typename Derived::BlockType >( matrix.blocks(), matrix.majorIndex(), i, rhsSegmenter[i], temp_compute[tid], make_constant_array(alpha) ) ;
 			}
 
-			{
-				Lock::Guard<> guard( lock ) ;
-				res += locRes ;
-			}
+			const int num_threads = omp_get_num_threads() ;
+			sum_reduce( temp_compute, temp_compute+num_threads ) ;
 		}
+		res += temp_compute[0] ;
+
+		delete[] temp_compute ;
 	}
 #endif
 

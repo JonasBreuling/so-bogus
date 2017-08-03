@@ -39,9 +39,9 @@ namespace krylov {
 		( or in parallel if parallelizeRhs( true ) has been called )
 */
 template< template < typename, typename, typename > class Method,
-		  typename Matrix, typename Preconditioner, typename Traits >
+          typename Matrix, typename Preconditioner, typename Traits >
 struct KrylovSolverBase
-		: public LinearSolverBase< Method< Matrix, Preconditioner, Traits > >
+        : public LinearSolverBase< Method< Matrix, Preconditioner, Traits > >
 {
 	typedef Method< Matrix, Preconditioner, Traits > Derived ;
 	typedef LinearSolverBase< Derived > Base ;
@@ -56,21 +56,21 @@ struct KrylovSolverBase
 	unsigned m_maxIters;
 
 	KrylovSolverBase( const Matrix &A,
-					  unsigned maxIters, Scalar tol,
-					  const Preconditioner *P,
-					  const SignalType *callback
-			)
-		: m_A( &A ), m_P( P ), m_callback( callback ),
-		  m_tol( tol ), m_maxIters( maxIters ),
-		  m_parallelizeRhs( false ), m_enableResCaching( false )
+	                  unsigned maxIters, Scalar tol,
+	                  const Preconditioner *P,
+	                  const SignalType *callback
+	        )
+	    : m_A( &A ), m_P( P ), m_callback( callback ),
+	      m_tol( tol ), m_maxIters( maxIters ),
+	      m_parallelizeRhs( false ), m_enableResCaching( false )
 	{}
 
 	KrylovSolverBase( )
-		: m_A( BOGUS_NULL_PTR(const Matrix) ),
-		  m_P( BOGUS_NULL_PTR(const Preconditioner) ),
-		  m_callback( BOGUS_NULL_PTR(const SignalType) ),
-		  m_tol( 0 ), m_maxIters( 0 ),
-		  m_parallelizeRhs( false ), m_enableResCaching( false )
+	    : m_A( BOGUS_NULL_PTR(const Matrix) ),
+	      m_P( BOGUS_NULL_PTR(const Preconditioner) ),
+	      m_callback( BOGUS_NULL_PTR(const SignalType) ),
+	      m_tol( 0 ), m_maxIters( 0 ),
+	      m_parallelizeRhs( false ), m_enableResCaching( false )
 	{}
 
 	//! Returns the solution \b x of the linear system \b M \c * \b x \c = \c rhs
@@ -102,13 +102,32 @@ struct KrylovSolverBase
 	Scalar solve( const RhsT& rhs, ResT& x ) const
 	{
 		Scalar res = 0;
-#ifndef BOGUS_DONT_PARALLELIZE
-#pragma omp parallel for reduction( +:res ) if ( m_parallelizeRhs )
-#endif
+#ifdef BOGUS_DONT_PARALLELIZE
 		for( std::ptrdiff_t c = 0 ; c < (std::ptrdiff_t) rhs.cols() ; ++c )
 		{
 			res += Base::derived().vectorSolve( rhs.col( c ), x.col( c ) ) ;
 		}
+#else
+		std::vector< Scalar > lerr ( omp_get_max_threads(), 0 ) ;
+
+#pragma omp parallel if (m_parallelizeRhs)
+		{
+			const int tid = omp_get_thread_num() ;
+#pragma omp for
+			for( std::ptrdiff_t c = 0 ; c < (std::ptrdiff_t) rhs.cols() ; ++c )
+			{
+				lerr[tid] += Base::derived().vectorSolve( rhs.col( c ), x.col( c ) ) ;
+			}
+
+#pragma omp single
+			{
+				const int num_threads = omp_get_num_threads() ;
+				for( int i = 0 ; i < num_threads ; ++i ) {
+					res += lerr[i] ;
+				}
+			}
+		}
+#endif
 
 		return res ;
 	}
@@ -142,7 +161,7 @@ namespace solvers {
 #define BOGUS_MAKE_KRYLOV_SOLVER_TYPEDEFS( MethodName ) \
 	typedef KrylovSolverBase< solvers::MethodName, Matrix, Preconditioner, Traits > Base ; \
 	typedef typename Traits::Scalar Scalar ; 			\
-														\
+	                                                    \
 	using Base::m_A ;									\
 	using Base::m_P ;									\
 	using Base::m_maxIters ;							\
@@ -157,10 +176,10 @@ namespace solvers {
 	const Preconditioner *P = BOGUS_NULL_PTR(const Preconditioner), \
 	const typename Base::SignalType *callback = BOGUS_NULL_PTR(const typename Base::SignalType ) )\
 	: Base( A, maxIters, tol, P, callback ) 			\
-		{}												\
-														\
+        {}												\
+	                                                    \
 	MethodName():Base()	{}								\
-														\
+	                                                    \
 	template < typename RhsT, typename ResT > 			\
 	Scalar vectorSolve( const RhsT &b, ResT x ) const ;		\
 
@@ -175,8 +194,8 @@ namespace solvers {
 		<b>Storage requirements: </b> 4n
 	*/
 template < typename Matrix,
-		   typename Preconditioner = TrivialPreconditioner< Matrix >,
-		   typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
+           typename Preconditioner = TrivialPreconditioner< Matrix >,
+           typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
 struct CG : public KrylovSolverBase< CG, Matrix, Preconditioner, Traits >
 {
 
@@ -194,8 +213,8 @@ struct CG : public KrylovSolverBase< CG, Matrix, Preconditioner, Traits >
 		<b>Storage requirements: </b> 8n
 	*/
 template < typename Matrix,
-		   typename Preconditioner = TrivialPreconditioner< Matrix >,
-		   typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
+           typename Preconditioner = TrivialPreconditioner< Matrix >,
+           typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
 struct BiCG : public KrylovSolverBase< BiCG, Matrix, Preconditioner, Traits>
 {
 
@@ -215,8 +234,8 @@ struct BiCG : public KrylovSolverBase< BiCG, Matrix, Preconditioner, Traits>
 
 	*/
 template < typename Matrix,
-		   typename Preconditioner = TrivialPreconditioner< Matrix >,
-		   typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
+           typename Preconditioner = TrivialPreconditioner< Matrix >,
+           typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
 struct BiCGSTAB : public KrylovSolverBase< BiCGSTAB, Matrix, Preconditioner, Traits>
 {
 
@@ -233,8 +252,8 @@ struct BiCGSTAB : public KrylovSolverBase< BiCGSTAB, Matrix, Preconditioner, Tra
 		<b>Storage requirements: </b> 7n
 	*/
 template < typename Matrix,
-		   typename Preconditioner = TrivialPreconditioner< Matrix >,
-		   typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
+           typename Preconditioner = TrivialPreconditioner< Matrix >,
+           typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
 struct CGS : public KrylovSolverBase< CGS, Matrix, Preconditioner, Traits>
 {
 
@@ -258,8 +277,8 @@ struct CGS : public KrylovSolverBase< CGS, Matrix, Preconditioner, Traits>
 
 	*/
 template < typename Matrix,
-		   typename Preconditioner = TrivialPreconditioner< Matrix >,
-		   typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
+           typename Preconditioner = TrivialPreconditioner< Matrix >,
+           typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
 struct GMRES : public KrylovSolverBase< GMRES, Matrix, Preconditioner, Traits>
 {
 	BOGUS_MAKE_KRYLOV_SOLVER_TYPEDEFS( GMRES )
@@ -268,13 +287,13 @@ struct GMRES : public KrylovSolverBase< GMRES, Matrix, Preconditioner, Traits>
 	{}
 
 	GMRES( const Matrix &A,
-		   unsigned maxIters,
-		   Scalar tol = NumTraits< Scalar >::epsilon(),
-		   const Preconditioner *P = BOGUS_NULL_PTR( const Preconditioner),
-		   const typename Base::SignalType *callback = BOGUS_NULL_PTR(const typename Base::SignalType),
-		   unsigned restart = 0 )
-		: Base( A, maxIters, tol, P, callback ),
-		  m_restart( restart )
+	       unsigned maxIters,
+	       Scalar tol = NumTraits< Scalar >::epsilon(),
+	       const Preconditioner *P = BOGUS_NULL_PTR( const Preconditioner),
+	       const typename Base::SignalType *callback = BOGUS_NULL_PTR(const typename Base::SignalType),
+	       unsigned restart = 0 )
+	    : Base( A, maxIters, tol, P, callback ),
+	      m_restart( restart )
 	{}
 
 	GMRES &setRestart( unsigned restart )
@@ -301,8 +320,8 @@ protected:
 		\warning This function returns an approximation of the residual instead of the real one
 	*/
 template < typename Matrix,
-		   typename Preconditioner = TrivialPreconditioner< Matrix >,
-		   typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
+           typename Preconditioner = TrivialPreconditioner< Matrix >,
+           typename Traits = ProblemTraits< typename MatrixTraits<Matrix>::Scalar > >
 struct TFQMR : public KrylovSolverBase< TFQMR, Matrix, Preconditioner, Traits>
 {
 	BOGUS_MAKE_KRYLOV_SOLVER_HEADER( TFQMR )
@@ -319,19 +338,19 @@ struct TFQMR : public KrylovSolverBase< TFQMR, Matrix, Preconditioner, Traits>
 #define BOGUS_PROCESS_KRYLOV_METHOD( MethodName ) \
 	template< typename Matrix, typename Preconditioner, class Traits > \
 	struct LinearSolverTraits< krylov::solvers::MethodName< Matrix, Preconditioner, Traits > > \
-	{ \
+    { \
 	  typedef Matrix MatrixType ; \
 	  template < typename RhsT > struct Result { \
-		  typedef typename Traits::template MutableClone< RhsT >::Type Type ; \
-	  } ; \
-	} ; \
+	      typedef typename Traits::template MutableClone< RhsT >::Type Type ; \
+      } ; \
+    } ; \
 	template< typename Matrix, typename Preconditioner, class Traits, \
-			  typename RhsBlockT, bool TransposeLhs, bool TransposeRhs > \
+	          typename RhsBlockT, bool TransposeLhs, bool TransposeRhs > \
 	struct BlockBlockProductTraits <  krylov::solvers::MethodName< Matrix, Preconditioner, Traits >, RhsBlockT, TransposeLhs, TransposeRhs > \
-	{ \
-		typedef typename BlockBlockProductTraits < Matrix, RhsBlockT, TransposeLhs, TransposeRhs >::ReturnType \
-		ReturnType ; \
-	} ; \
+    { \
+	    typedef typename BlockBlockProductTraits < Matrix, RhsBlockT, TransposeLhs, TransposeRhs >::ReturnType \
+	    ReturnType ; \
+    } ; \
 
 BOGUS_KRYLOV_METHODS
 #undef BOGUS_PROCESS_KRYLOV_METHOD

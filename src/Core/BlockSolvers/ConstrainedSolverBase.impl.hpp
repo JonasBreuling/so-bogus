@@ -23,30 +23,30 @@ template < typename Derived, typename BlockMatrixType >
 template < typename NSLaw, typename RhsT, typename ResT >
 typename ConstrainedSolverBase< Derived, BlockMatrixType >::Scalar
 ConstrainedSolverBase< Derived, BlockMatrixType >::eval( const NSLaw &law,
-							const ResT &y, const RhsT &x ) const
+                            const ResT &y, const RhsT &x ) const
 {
 	const Index dimension = BlockProblemTraits::dimension ;
 
 	const Segmenter< dimension, const RhsT, typename BlockMatrixType::Index >
-			xSegmenter( x, m_matrix->rowOffsets() ) ;
+	        xSegmenter( x, m_matrix->rowOffsets() ) ;
 	const Segmenter< dimension, const ResT, typename BlockMatrixType::Index >
-			ySegmenter( y, m_matrix->rowOffsets() ) ;
+	        ySegmenter( y, m_matrix->rowOffsets() ) ;
 
 	typedef typename BlockMatrixTraits< BlockMatrixType >::Index Index ;
 
 	const Index n = m_matrix->rowsOfBlocks() ;
 
-	Scalar err = 0., lres ;
+	Scalar err = 0. ;
 	typename NSLaw::Traits::Vector lx, ly ;
 
 	if( m_useInfinityNorm )
 	{
 
-	#ifndef BOGUS_DONT_PARALLELIZE
-	#pragma omp parallel private( lx, ly, lres )
-	#endif
+    #ifndef BOGUS_DONT_PARALLELIZE
+    #pragma omp parallel private( lx, ly )
+    #endif
 		{
-			lres = 0. ;
+			Scalar lres = 0. ;
 
 #ifndef BOGUS_DONT_PARALLELIZE
 #pragma omp for
@@ -68,16 +68,36 @@ ConstrainedSolverBase< Derived, BlockMatrixType >::eval( const NSLaw &law,
 
 	} else {
 
-	#ifndef BOGUS_DONT_PARALLELIZE
-	#pragma omp parallel for private( lx, ly, lres ) reduction ( + : err )
-	#endif
+#ifdef BOGUS_DONT_PARALLELIZE
 		for( Index i = 0 ; i < n ; ++ i )
 		{
 			lx = xSegmenter[ i ] * m_scaling[i] ;
 			ly = ySegmenter[ i ] ;
-			lres = law.eval( i, lx, ly ) ;
-			err += lres ;
+			err += law.eval( i, lx, ly ) ;
 		}
+#else
+		std::vector< Scalar > lerr ( omp_get_max_threads(), 0 ) ;
+
+        #pragma omp parallel private(lx, ly)
+		{
+			const int tid = omp_get_thread_num() ;
+#pragma omp for
+			for( Index i = 0 ; i < n ; ++ i )
+			{
+				lx = xSegmenter[ i ] * m_scaling[i] ;
+				ly = ySegmenter[ i ] ;
+				lerr[tid] += law.eval( i, lx, ly ) ;
+			}
+
+#pragma omp single
+			{
+				const int num_threads = omp_get_num_threads() ;
+				for( int i = 0 ; i < num_threads ; ++i ) {
+					err += lerr[i] ;
+				}
+			}
+		}
+#endif
 
 		return err / ( 1 + n );
 
@@ -94,13 +114,13 @@ typename MatrixT::Scalar estimate_block_scaling( const MatrixT& block )
 
 template< typename Derived >
 void estimate_row_scaling( const BlockObjectBase< Derived >& ,
-					   typename BlockObjectBase< Derived >::Scalar* )
+                       typename BlockObjectBase< Derived >::Scalar* )
 {
 }
 
 template< typename Derived >
 void estimate_row_scaling( const BlockMatrixBase< Derived >& mat,
-					 typename Derived::Scalar* scalings )
+                     typename Derived::Scalar* scalings )
 {
 	typedef BlockMatrixTraits< Derived > BlockTraits ;
 	typedef typename BlockTraits::BlockType LocalMatrixType ;
@@ -143,10 +163,10 @@ void ConstrainedSolverBase< Derived, BlockMatrixType >::updateScalings()
 template < typename Derived, typename BlockMatrixType >
 template < typename NSLaw, typename VectorT >
 void ConstrainedSolverBase<  Derived,BlockMatrixType >::projectOnConstraints(
-		const NSLaw &law, VectorT &x ) const
+        const NSLaw &law, VectorT &x ) const
 {
 	Segmenter< NSLaw::dimension, VectorT, typename BlockMatrixType::Index >
-			xSegmenter( x, m_matrix->rowOffsets() ) ;
+	        xSegmenter( x, m_matrix->rowOffsets() ) ;
 
 	const Index n = m_matrix->rowsOfBlocks() ;
 	typename NSLaw::Traits::Vector lx ;
@@ -166,12 +186,12 @@ void ConstrainedSolverBase<  Derived,BlockMatrixType >::projectOnConstraints(
 template < typename Derived, typename BlockMatrixType >
 template < typename NSLaw, typename RhsT, typename ResT >
 void ConstrainedSolverBase<  Derived,BlockMatrixType >::dualityCOV(
-		const NSLaw &law, const RhsT &u, ResT &s ) const
+        const NSLaw &law, const RhsT &u, ResT &s ) const
 {
 	const Segmenter< NSLaw::dimension, const RhsT, typename BlockMatrixType::Index >
-			uSegmenter( u, m_matrix->rowOffsets() ) ;
+	        uSegmenter( u, m_matrix->rowOffsets() ) ;
 	Segmenter< NSLaw::dimension, ResT, typename BlockMatrixType::Index >
-			sSegmenter( s, m_matrix->rowOffsets() ) ;
+	        sSegmenter( s, m_matrix->rowOffsets() ) ;
 
 	const Index n = m_matrix->rowsOfBlocks() ;
 	typename NSLaw::Traits::Vector ls ;

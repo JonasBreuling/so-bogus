@@ -36,7 +36,7 @@ TEST_F( SmallFrictionPb, ADMM )
 	{
 		const unsigned dofs = MassMat.blockRows( i ) ;
 		Eigen::MatrixXd Mi =
-				MassMat.block( i ) + 1./lambda * Eigen::MatrixXd::Identity( dofs, dofs ) ;
+		        MassMat.block( i ) + 1./lambda * Eigen::MatrixXd::Identity( dofs, dofs ) ;
 
 		InvMLambda.block( i ) = Mi.inverse() ;
 	}
@@ -67,8 +67,8 @@ TEST_F( SmallFrictionPb, ADMM )
 #endif
 
 #ifdef TEST_DUAL
-	// Rationale
-	/*
+    // Rationale
+    /*
 	 * min J(r) + IKmu(r)
 	 *
 	 * J(r) =.5  r W r + ( w - HM^{-1} f ) ' r

@@ -329,7 +329,7 @@ double MecheFrictionProblem::solve(
 
 		if( options.algorithm == MatrixFreeGaussSeidel )
 		{
-			typename PrimalFrictionProblem< 3u >::ProductGaussSeidelType gs ;
+			PrimalFrictionProblem< 3u >::ProductGaussSeidelType gs ;
 			if( options.tolerance   != 0. ) gs.setTol( options.tolerance );
 			if( options.maxIters    != 0  ) gs.setMaxIters( options.maxIters );
 			if( options.gsSkipIters >= 0  ) gs.setSkipIters( options.gsSkipIters );
@@ -536,7 +536,8 @@ bool MecheFrictionProblem::dumpToFile( const char*, const double* ) const
 	std::cerr << "MecheInterface::dumpToFile: Error, bogus compiled without serialization capabilities" ;
 	return false ;
 }
-bool MecheFrictionProblem::fromFile(const char*, double *& ) {
+bool MecheFrictionProblem::fromFile( const char* , double *& , bool )
+{
 	std::cerr << "MecheInterface::fromFile: Error, bogus compiled without serialization capabilities" ;
 	return false ;
 }

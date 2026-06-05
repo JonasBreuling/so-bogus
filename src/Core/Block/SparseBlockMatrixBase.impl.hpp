@@ -351,22 +351,22 @@ Derived& SparseBlockMatrixBase< Derived >::prune( const Scalar precision )
 	return derived() ;
 }
 
-namespace perm_impl {
-template< typename T, typename U >
-typename EnableIf<U::RowsAtCompileTime == T::RowsAtCompileTime, void >::ReturnType
-swap( T t, U u )
-{
-	using std::swap ;
-	for( unsigned i = 0 ; i < u.rows() ; ++i )
-		swap( t[i], u[i] ) ;
-}
-}
+// TODO: This is now implemented in Eigen and can be removed
+// namespace perm_impl {
+// template< typename T, typename U >
+// typename EnableIf<U::RowsAtCompileTime == T::RowsAtCompileTime, void >::ReturnType
+// swap( T t, U u )
+// {
+// 	using std::swap ;
+// 	for( unsigned i = 0 ; i < u.rows() ; ++i )
+// 		swap( t[i], u[i] ) ;
+// }
+// }
 
 template < typename IndexT, typename ArrayT >
 void applyPermutation( const IndexT n, const IndexT* permutation, ArrayT& array )
 {
 	using std::swap ;
-	using perm_impl::swap ;
 
 	std::vector< bool > swapped( n, false ) ;
 	for( IndexT i = 0 ; i < n ; ++i )

@@ -11,7 +11,9 @@
 #ifndef BOGUS_EIGEN_BLOCK_CONTAINERS_HPP
 #define BOGUS_EIGEN_BLOCK_CONTAINERS_HPP
 
-#include <Eigen/StdVector>
+// TODO: Is this still required for eigen3.5?
+// #include <Eigen/StdVector>
+#include <Eigen/Core>
 #include "../Utils/CppTools.hpp"
 
 namespace bogus {

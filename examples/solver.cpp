@@ -5,11 +5,15 @@
 #include "Core/BlockSolvers/Krylov.impl.hpp"
 #include "Core/BlockSolvers/GaussSeidel.impl.hpp"
 #include "Core/BlockSolvers/ProjectedGradient.impl.hpp"
+#include "Core/BlockSolvers/ProductGaussSeidel.impl.hpp"
 
 #include "Core/BlockSolvers/NoneLaw.hpp"
 // #include "Core/BlockSolvers/LCPLaw.impl.hpp"
 // #include "Core/BlockSolvers/PyramidLaw.impl.hpp"
 
+// TODO: The issue is that the block size of the off diagonal matrices does not 
+// match the NoneLaw with dimension one. This should either be dynamically sized 
+// or adapted.
 int main()
 {
     typedef Eigen::MatrixXd Block;

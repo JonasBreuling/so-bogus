@@ -27,6 +27,7 @@ class NoneLaw
 {
 public:
 	enum{ dimension = 1 } ;
+	// enum{ dimension = internal::DYNAMIC } ;
 
 	typedef LocalProblemTraits< dimension, Scalar > Traits ;
 

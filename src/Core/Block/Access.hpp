@@ -185,7 +185,7 @@ struct Segmenter
 	}
 
 private:
-	VectorType &		 m_vec ;
+	VectorType& m_vec ;
 } ;
 
 template < typename VectorType, typename Index >
@@ -198,7 +198,7 @@ struct Segmenter< internal::DYNAMIC, VectorType, Index >
 
 	Segmenter( VectorType &vec, const Index* offsets ) : m_vec( vec ), m_offsets( offsets ) { }
 
-	inline ReturnType operator[]( const Index inner )
+	inline ReturnType operator[]( const Index inner )																																																										
 	{
 		return m_vec.middleRows( m_offsets[ inner ], m_offsets[ inner + 1 ] - m_offsets[ inner ] ) ;
 	}
@@ -210,7 +210,7 @@ struct Segmenter< internal::DYNAMIC, VectorType, Index >
 
 
 private:
-	VectorType &		 m_vec ;
+	VectorType & m_vec ;
 	const Index* m_offsets ;
 } ;
 

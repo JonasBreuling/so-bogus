@@ -4,6 +4,7 @@
 #include "Core/BlockSolvers/GaussSeidel.impl.hpp"
 #include "Core/BlockSolvers/Krylov.impl.hpp"
 #include "Core/BlockSolvers/GaussSeidel.impl.hpp"
+#include "Core/BlockSolvers/ProjectedGradient.impl.hpp"
 
 #include "Core/BlockSolvers/NoneLaw.hpp"
 // #include "Core/BlockSolvers/LCPLaw.impl.hpp"
@@ -63,15 +64,38 @@ int main()
 
         bogus::Krylov<
             bogus::SparseBlockMatrix<Block>
-        > krlov_solver(A);
+        > solver(A);
 
-        krlov_solver.setMaxIters(1000);
-        krlov_solver.setTol(1e-12);
+        solver.setMaxIters(1000);
+        solver.setTol(1e-12);
 
-        krlov_solver.solve(
+        solver.solve(
             b,
             x,
             bogus::krylov::CG
+        );
+
+        std::cout << "solution: " << x.transpose() << std::endl;
+
+        // test error
+        Eigen::VectorXd error = A * x - b;
+        std::cout << "error: " << error.transpose() << std::endl;
+    }
+
+    {
+        std::cout << "Projected gradient solver:\n";
+
+        bogus::ProjectedGradient<
+            bogus::SparseBlockMatrix<Block>
+        > solver(A);
+
+        solver.setMaxIters(1000);
+        solver.setTol(1e-12);
+
+        solver.solve(
+            bogus::NoneLaw< double >(),
+            b,
+            x
         );
 
         std::cout << "solution: " << x.transpose() << std::endl;
@@ -86,12 +110,12 @@ int main()
 
         bogus::GaussSeidel<
             bogus::SparseBlockMatrix<Block>
-        > gauss_seidel_solver(A);
+        > solver(A);
 
-        gauss_seidel_solver.setMaxIters(1000);
-        gauss_seidel_solver.setTol(1e-12);
+        solver.setMaxIters(1000);
+        solver.setTol(1e-12);
 
-        gauss_seidel_solver.solve(
+        solver.solve(
             bogus::NoneLaw< double >(),
             b,
             x

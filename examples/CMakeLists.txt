@@ -5,3 +5,9 @@ target_link_libraries(hello PRIVATE bogus)
 target_include_directories(hello PRIVATE
     ../src/
 )
+
+add_executable(solver solver.cpp)
+target_link_libraries(solver PRIVATE bogus)
+target_include_directories(solver PRIVATE
+    ../src/
+)

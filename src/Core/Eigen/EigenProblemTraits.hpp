@@ -80,6 +80,8 @@ struct LocalProblemTraits< Eigen::Dynamic, Scalar > : public ProblemTraits< Eige
 	typedef Eigen::Matrix< Scalar, Eigen::Dynamic, Eigen::Dynamic > Matrix ;
 	typedef ProblemTraits< Matrix > Base ;
 
+	enum { dimension = Eigen::Dynamic } ;
+
 	typedef typename Base::DynVector Vector ;
 	typedef typename Base::DynMatrix TgMatrix ;
 

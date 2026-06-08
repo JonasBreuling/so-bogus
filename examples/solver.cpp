@@ -5,8 +5,9 @@
 #include "Core/BlockSolvers/Krylov.impl.hpp"
 #include "Core/BlockSolvers/GaussSeidel.impl.hpp"
 
-#include "Core/BlockSolvers/LCPLaw.impl.hpp"
-#include "Core/BlockSolvers/PyramidLaw.impl.hpp"
+#include "Core/BlockSolvers/NoneLaw.hpp"
+// #include "Core/BlockSolvers/LCPLaw.impl.hpp"
+// #include "Core/BlockSolvers/PyramidLaw.impl.hpp"
 
 int main()
 {
@@ -91,7 +92,7 @@ int main()
         gauss_seidel_solver.setTol(1e-12);
 
         gauss_seidel_solver.solve(
-            bogus::LCPLaw< double >(),
+            bogus::NoneLaw< double >(),
             b,
             x
         );

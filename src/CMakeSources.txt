@@ -53,6 +53,7 @@ Core/BlockSolvers/KrylovMethods.hpp
 Core/BlockSolvers/KrylovMethods.impl.hpp
 Core/BlockSolvers/LCPLaw.hpp
 Core/BlockSolvers/LCPLaw.impl.hpp
+Core/BlockSolvers/NoneLaw.hpp
 Core/BlockSolvers/Preconditioners.hpp
 Core/BlockSolvers/Preconditioners.impl.hpp
 Core/BlockSolvers/ProductGaussSeidel.hpp

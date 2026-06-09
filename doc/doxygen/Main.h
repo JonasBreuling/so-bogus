@@ -78,13 +78,6 @@ See \ref mkl.
 Enable serialization API.
 <i> Not defined by default. </i>
 
-\c BOGUS_SHARED_PTR_NS
-
-If defined, bogus will use shared_ptr from this namespace instead of its own limited NaiveSharedPtr.
-Values such as \c tr1 for C++03 or \c std for C++11 should work.
-<i> Not defined by default. </i>
-
-
 \section extra Extra
 The \ref extra header-only library collects all modules that were not suited for inclusion in \ref core,
 for reasons as trivial as licensing issues.

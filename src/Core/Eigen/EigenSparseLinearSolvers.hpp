@@ -12,6 +12,8 @@
 #ifndef BOGUS_EIGEN_SPARSE_LINEAR_SOLVERS_HPP
 #define BOGUS_EIGEN_SPARSE_LINEAR_SOLVERS_HPP
 
+#include <memory>
+
 /*  Depending on your version of Eigen, this file may make use of LGPL licensed code.
 	See Eigen/src/Sparse/SimplicialCholesky.h for more information
 */
@@ -23,7 +25,6 @@
 
 #include "EigenLinearSolvers.hpp"
 #include "../Utils/LinearSolverBase.hpp"
-#include "../Utils/NaiveSharedPtr.hpp"
 
 #include <Eigen/OrderingMethods>
 
@@ -103,7 +104,7 @@ struct Factorization< Eigen::SparseMatrixBase< Derived >, FactType >
 	}
 
   protected:
-	BOGUS_SHARED_PTR( typename Traits::FactType, m_fact ) ;
+	std::shared_ptr<typename Traits::FactType> m_fact;
 } ;
 
 template < typename Derived, typename FactType >

@@ -75,7 +75,6 @@ Core/Eigen/SparseHeader.hpp
 Core/Utils/CppTools.hpp
 Core/Utils/LinearSolverBase.hpp
 Core/Utils/Lock.hpp
-Core/Utils/NaiveSharedPtr.hpp
 Core/Utils/NonSmoothNewton.hpp
 Core/Utils/NonSmoothNewton.impl.hpp
 Core/Utils/NumTraits.hpp

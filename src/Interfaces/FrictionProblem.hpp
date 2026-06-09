@@ -188,15 +188,15 @@ struct DualFrictionProblem
 	  \returns the error as returned by the GaussSeidel::solve() function
 	  */
 	double solveCadoux( GaussSeidelType &gs, double * r, const unsigned fpIterations,
-	       const SignalType* callback = BOGUS_NULL_PTR(const SignalType) ) const ;
+	       const SignalType* callback = nullptr ) const ;
 	double solveCadoux( ProjectedGradientType &pg, double * r, const unsigned fpIterations,
-	       const SignalType* callback = BOGUS_NULL_PTR(const SignalType) ) const ;
+	       const SignalType* callback = nullptr ) const ;
 
 	//! Idem as solveCadoux, but interpreting the problem as r = Wu + b
 	double solveCadouxVel( GaussSeidelType &gs, double * u, const unsigned fpIterations,
-	       const SignalType* callback = BOGUS_NULL_PTR(const SignalType) ) const ;
+	       const SignalType* callback = nullptr ) const ;
 	double solveCadouxVel( ProjectedGradientType &pg, double * u, const unsigned fpIterations,
-	       const SignalType* callback = BOGUS_NULL_PTR(const SignalType) ) const ;
+	       const SignalType* callback = nullptr ) const ;
 
 
 	//! Apply a permutation on the contact indices

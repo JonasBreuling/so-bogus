@@ -17,16 +17,18 @@
 
 #include "../Utils/CppTools.hpp"
 
+#include <type_traits>
+
 namespace bogus {
 
 //! Specialization of transpose_block() for self-adjoint types
 template < typename SelfTransposeT >
-inline typename EnableIf< BlockTraits< SelfTransposeT >::is_self_transpose, const SelfTransposeT& >::ReturnType
+inline typename std::enable_if_t< BlockTraits< SelfTransposeT >::is_self_transpose, const SelfTransposeT& >
 transpose_block( const SelfTransposeT &block  ) { return  block ; }
 
 //! Specialization of transpose_block() for types that define a ConstTransposeReturnType
 template< typename BlockType >
-inline typename EnableIf< !BlockTraits< BlockType >::is_self_transpose, typename BlockType::ConstTransposeReturnType >::ReturnType
+inline typename std::enable_if_t< !BlockTraits< BlockType >::is_self_transpose, typename BlockType::ConstTransposeReturnType >
 transpose_block ( const BlockType& block )
 {
 	return block.transpose() ;
@@ -41,8 +43,8 @@ transpose_block ( const BlockType& block )
   */
 template< typename BlockType,
 		  bool IsSelfTranspose = BlockTraits< BlockType >::is_self_transpose,
-		  bool DefinesConstTranspose = HasConstTransposeReturnType< BlockType >::Value,
-		  bool DefinesTransposeTraits = HasReturnType< BlockTransposeTraits< BlockType > >::Value >
+		  bool DefinesConstTranspose = HasConstTransposeReturnType< BlockType >::value,
+		  bool DefinesTransposeTraits = HasReturnType< BlockTransposeTraits< BlockType > >::value >
 struct BlockTranspose {
 	enum { is_defined= 0 } ;
 } ;
@@ -122,10 +124,8 @@ template< typename BlockT, bool Transpose_ = false >
 struct BlockDims
 {
 	typedef BlockTraits< BlockT > Traits ;
-	typedef SwapIf< Transpose_, Traits::RowsAtCompileTime, Traits::ColsAtCompileTime > Dims ;
-
-		enum { Rows = Dims::First,
-			   Cols = Dims::Second } ;
+	static constexpr int Rows = Transpose_ ? Traits::ColsAtCompileTime : Traits::RowsAtCompileTime;
+	static constexpr int Cols = Transpose_ ? Traits::RowsAtCompileTime : Traits::ColsAtCompileTime;
 } ;
 
 namespace internal {

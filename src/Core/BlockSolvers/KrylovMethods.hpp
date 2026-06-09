@@ -66,9 +66,9 @@ struct KrylovSolverBase
 	{}
 
 	KrylovSolverBase( )
-		: m_A( BOGUS_NULL_PTR(const Matrix) ),
-		  m_P( BOGUS_NULL_PTR(const Preconditioner) ),
-		  m_callback( BOGUS_NULL_PTR(const SignalType) ),
+		: m_A( nullptr ),
+		  m_P( nullptr ),
+		  m_callback( nullptr ),
 		  m_tol( 0 ), m_maxIters( 0 ),
 		  m_parallelizeRhs( false ), m_enableResCaching( false )
 	{}
@@ -154,8 +154,8 @@ namespace solvers {
 	MethodName( const Matrix &A, 						\
 	unsigned maxIters,									\
 	Scalar tol = NumTraits< Scalar >::epsilon(),		\
-	const Preconditioner *P = BOGUS_NULL_PTR(const Preconditioner), \
-	const typename Base::SignalType *callback = BOGUS_NULL_PTR(const typename Base::SignalType ) )\
+	const Preconditioner *P = nullptr,                  \
+	const typename Base::SignalType *callback = nullptr)\
 	: Base( A, maxIters, tol, P, callback ) 			\
 		{}												\
 														\
@@ -270,8 +270,8 @@ struct GMRES : public KrylovSolverBase< GMRES, Matrix, Preconditioner, Traits>
 	GMRES( const Matrix &A,
 		   unsigned maxIters,
 		   Scalar tol = NumTraits< Scalar >::epsilon(),
-		   const Preconditioner *P = BOGUS_NULL_PTR( const Preconditioner),
-		   const typename Base::SignalType *callback = BOGUS_NULL_PTR(const typename Base::SignalType),
+		   const Preconditioner *P = nullptr,
+		   const typename Base::SignalType *callback = nullptr,
 		   unsigned restart = 0 )
 		: Base( A, maxIters, tol, P, callback ),
 		  m_restart( restart )

@@ -14,6 +14,7 @@
 #include <iostream>
 #include <vector>
 #include <cassert>
+#include <type_traits>
 
 namespace bogus
 {
@@ -22,99 +23,29 @@ namespace bogus
 #define BOGUS_HAS_CPP11 (__cplusplus >= 201103L)
 #endif
 
-// NULLPTR
-#if BOGUS_HAS_CPP11
-#define BOGUS_NULL_PTR( Type ) nullptr
-#else
-#define BOGUS_NULL_PTR( Type ) (static_cast<Type*>(0))
-#endif
+template<typename T, typename = void>
+struct HasReturnType : std::false_type {};
 
-// Swap template parameters if DoSwap is true
+template<typename T>
+struct HasReturnType<T, std::void_t<typename T::ReturnType>>
+    : std::true_type {};
 
-template < bool DoSwap, typename First_, typename Second_ >
-struct TypeSwapIf
-{
-	typedef First_  First  ;
-	typedef Second_ Second ;
-} ;
+template<typename T, typename = void>
+struct HasConstTransposeReturnType : std::false_type {};
 
-template < typename First_, typename Second_ >
-struct TypeSwapIf< true, First_, Second_ >
-{
-	typedef First_  Second  ;
-	typedef Second_ First ;
-} ;
+template<typename T>
+struct HasConstTransposeReturnType<
+    T,
+    std::void_t<typename T::ConstTransposeReturnType>>
+    : std::true_type {};
 
-template < bool DoSwap, int First_, int Second_ >
-struct SwapIf
-{
-	enum { First = First_, Second = Second_  } ;
-} ;
+// TODO: This is never used!
+template<typename T, typename = void>
+struct HasBase : std::false_type {};
 
-template < int First_, int Second_ >
-struct SwapIf< true, First_, Second_ >
-{
-	enum { First = Second_, Second = First_  } ;
-} ;
-
-// Is Same
-template < typename T1, typename T2>
-struct IsSame
-{
-	enum { Value = 0 } ;
-} ;
-template < typename T1 >
-struct IsSame< T1, T1 >
-{
-	enum { Value = 1 } ;
-} ;
-
-// Enable if (for SFINAE use )
-
-template < bool Condition, typename ReturnType_ = void >
-struct EnableIf
-{
-} ;
-
-template < typename ReturnType_ >
-struct EnableIf< true, ReturnType_ >
-{
-	typedef ReturnType_ ReturnType ;
-} ;
-
-template < bool Condition, typename ReturnType_ = void >
-struct DisableIf
-{
-} ;
-
-template < typename ReturnType_ >
-struct DisableIf< false, ReturnType_ >
-{
-	typedef ReturnType_ ReturnType ;
-} ;
-
-// Warning : HasXXX< T > does NOT work for reference typedefs !
-#define BOGUS_DEFINE_HAS_TYPE( TypeName ) \
-	template < typename BaseType > 	      \
-	struct Has##TypeName	              \
-    {	                                  \
-	private:                              \
-	    enum { True = 1, False = 2 } ;    \
-	    typedef char  TrueType[  True ] ; \
-	    typedef char FalseType[ False ] ; \
-	    template <typename T > struct Some { typedef int Type ; } ;  \
-	                                      \
-	    template< typename T >			  \
-	    static const  TrueType& check( typename Some<typename T::TypeName>::Type ) ; \
-	    template< typename >			  \
-	    static const FalseType& check( ... ) ; \
-	public:								  \
-	    enum { Value = ( True == sizeof( check< BaseType >( 0 ) ) ) } ;\
-    }
-
-BOGUS_DEFINE_HAS_TYPE( ReturnType ) ;
-BOGUS_DEFINE_HAS_TYPE( ConstTransposeReturnType ) ;
-BOGUS_DEFINE_HAS_TYPE( Base ) ;
+template<typename T>
+struct HasBase<T, std::void_t<typename T::Base>>
+    : std::true_type {};
 
 // Static assertions
 

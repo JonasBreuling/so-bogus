@@ -123,7 +123,6 @@ inline void resize ( Eigen::SparseMatrix< Scalar, Options, Index >& block, Index
 #endif
 
 // Block traits for Eigen::Matrix
-
 template< typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols >
 struct BlockTraits < Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols> >
 {
@@ -146,7 +145,6 @@ struct BlockTraits < Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _M
 } ;
 
 // Block/block product return type
-
 template<
     typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols,
     typename _Scalar2, int _Rows2, int _Cols2, int _Options2, int _MaxRows2, int _MaxCols2,
@@ -156,13 +154,14 @@ struct BlockBlockProductTraits <
          Eigen::Matrix<_Scalar2, _Rows2, _Cols2, _Options2, _MaxRows2, _MaxCols2>,
         TransposeLhs, TransposeRhs >
 {
-	typedef Eigen::Matrix< _Scalar,
-	    SwapIf< TransposeLhs, _Rows, _Cols >::First,
-	    SwapIf< TransposeRhs, _Rows2, _Cols2 >::Second,
-	    _Options,
-	    SwapIf< TransposeLhs, _MaxRows, _MaxCols >::First,
-	    SwapIf< TransposeRhs, _MaxRows2, _MaxCols2 >::Second >
-	ReturnType ;
+	using ReturnType = Eigen::Matrix<
+		_Scalar,
+		(TransposeLhs ? _Cols : _Rows),
+		(TransposeRhs ? _Rows2 : _Cols2),
+		_Options,
+		(TransposeLhs ? _MaxCols : _MaxRows),
+		(TransposeRhs ? _MaxRows2 : _MaxCols2)
+	>;
 } ;
 
 template< typename Derived >

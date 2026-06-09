@@ -16,6 +16,7 @@
 #include "ProductGaussSeidelUtils.hpp"
 
 #include <vector>
+#include <type_traits>
 
 namespace bogus
 {
@@ -37,7 +38,7 @@ namespace bogus
   \sa GaussSeidel
   */
 template < typename BlockMatrixType, typename DiagonalType = typename BlockMatrixType::Scalar,
-           bool PrecomputeDMt = !( IsSame<DiagonalType, typename BlockMatrixType::Scalar>::Value ) >
+           bool PrecomputeDMt = !( std::is_same_v<DiagonalType, typename BlockMatrixType::Scalar> ) >
 class ProductGaussSeidel
         : public GaussSeidelBase< ProductGaussSeidel<BlockMatrixType, DiagonalType, PrecomputeDMt>, BlockMatrixType >
 {
@@ -47,7 +48,7 @@ public:
 	typedef typename Base::GlobalProblemTraits GlobalProblemTraits ;
 	typedef typename GlobalProblemTraits::Scalar Scalar ;
 
-	enum {has_trivial_diagonal = IsSame<DiagonalType, typename BlockMatrixType::Scalar>::Value } ;
+	enum {has_trivial_diagonal = std::is_same_v<DiagonalType, typename BlockMatrixType::Scalar> } ;
 	typedef block_solvers_impl::DiagonalMatrixWrapper<DiagonalType, !!has_trivial_diagonal > DiagWrapper ;
 	typedef block_solvers_impl::DMtStorage<BlockMatrixType, DiagWrapper, PrecomputeDMt> DMtStorage ;
 

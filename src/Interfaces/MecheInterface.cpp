@@ -60,12 +60,12 @@ MecheFrictionProblem::Options::Options()
 }
 
 MecheFrictionProblem::MecheFrictionProblem()
-    : m_primal( BOGUS_NULL_PTR(PrimalFrictionProblem<3u>) ),
-      m_dual( BOGUS_NULL_PTR(DualFrictionProblem<3u>) ),
+    : m_primal( nullptr ),
+      m_dual( nullptr ),
         m_lastSolveTime( 0 ),
-        m_f( BOGUS_NULL_PTR(double) ),
-        m_w( BOGUS_NULL_PTR(double) ),
-        m_mu( BOGUS_NULL_PTR(double) ),
+        m_f( nullptr ),
+        m_w( nullptr ),
+        m_mu( nullptr ),
         m_out( &std::cout )
 {
 }
@@ -78,15 +78,15 @@ MecheFrictionProblem::~MecheFrictionProblem()
 void MecheFrictionProblem::destroy()
 {
 	delete[] m_f ;
-	m_f = BOGUS_NULL_PTR(double) ;
+	m_f = nullptr ;
 	delete[] m_w ;
-	m_w = BOGUS_NULL_PTR(double) ;
+	m_w = nullptr ;
 	delete[] m_mu ;
-	m_mu = BOGUS_NULL_PTR(double) ;
+	m_mu = nullptr ;
 	delete m_primal ;
-	m_primal = BOGUS_NULL_PTR(PrimalFrictionProblem<3u>) ;
+	m_primal = nullptr ;
 	delete m_dual ;
-	m_dual =  BOGUS_NULL_PTR(DualFrictionProblem<3u>) ;
+	m_dual =  nullptr ;
 }
 
 void MecheFrictionProblem::ackCurrentResidual( unsigned GSIter, double err )
@@ -517,7 +517,7 @@ bool MecheFrictionProblem::fromFile( const char* fileName, double *& r0, bool ol
 		delete m_w ;
 		delete m_mu ;
 		delete r0 ;
-		r0 = m_f = m_w = m_mu = BOGUS_NULL_PTR( double ) ;
+		r0 = m_f = m_w = m_mu = nullptr ;
 		return false ;
 	}
 

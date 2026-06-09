@@ -64,8 +64,8 @@ public:
 	// Transpose index is compressed for perf, as we always create it in a compressed-compatible way
 	typedef CompressedIndexType TransposeIndexType ;
 
-	typedef typename TypeSwapIf< Traits::is_col_major, MajorIndexType, MinorIndexType >::First  RowIndexType ;
-	typedef typename TypeSwapIf< Traits::is_col_major, MajorIndexType, MinorIndexType >::Second ColIndexType ;
+	using RowIndexType = std::conditional_t<Traits::is_col_major, MinorIndexType, MajorIndexType>;
+	using ColIndexType = std::conditional_t<Traits::is_col_major, MajorIndexType, MinorIndexType>;
 
 	// Canonical type for a mutable matrix with different block type
 	template < typename OtherBlockType, bool PreserveSymmetry = true, bool SwitchDirection = false >

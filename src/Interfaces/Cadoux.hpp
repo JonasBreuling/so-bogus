@@ -47,7 +47,7 @@ static typename WType::Scalar solveCadoux(
 		const typename WType::Scalar* b, const typename WType::Scalar* mu,
 		ConstrainedSolverBase< Method, MatrixT > &minimizer,
 		typename WType::Scalar *r, const unsigned cadouxIterations,
-		const Signal<unsigned, typename WType::Scalar> *callback = BOGUS_NULL_PTR(const void),
+		const Signal<unsigned, typename WType::Scalar> *callback = nullptr,
 		const typename WType::Scalar tolTighten = 1.e-1
 		)
 {
@@ -103,7 +103,7 @@ static double solveCadouxVel(
 		const typename WType::Scalar* b, const typename WType::Scalar* mu,
 		ConstrainedSolverBase< Method, MatrixT > &minimizer,
 		typename WType::Scalar* u, const unsigned cadouxIterations,
-		const Signal<unsigned, typename WType::Scalar> *callback = BOGUS_NULL_PTR(const void),
+		const Signal<unsigned, typename WType::Scalar> *callback = nullptr,
 		const typename WType::Scalar tolTighten = 1.e-1
 		)
 {

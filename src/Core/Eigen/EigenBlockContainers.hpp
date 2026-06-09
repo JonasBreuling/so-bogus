@@ -11,8 +11,6 @@
 #ifndef BOGUS_EIGEN_BLOCK_CONTAINERS_HPP
 #define BOGUS_EIGEN_BLOCK_CONTAINERS_HPP
 
-// TODO: Is this still required for eigen3.5?
-// #include <Eigen/StdVector>
 #include <Eigen/Core>
 #include "../Utils/CppTools.hpp"
 
@@ -22,11 +20,19 @@ namespace bogus {
 template< typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols >
 struct ResizableSequenceContainer< Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> >
 {
-	typedef Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> BlockType ;
-	typedef typename TypeSwapIf< 
-		Rows == Eigen::Dynamic || Cols == Eigen::Dynamic || 0 != ( static_cast< std::size_t >( Rows * Cols * sizeof( Scalar ) ) & 0xf ),
-		std::vector< BlockType, Eigen::aligned_allocator<BlockType> >,
-		std::vector< BlockType > >::First Type ;
+	typedef Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> BlockType;
+
+	static constexpr bool UseAlignedAllocator = 
+		!(Rows == Eigen::Dynamic ||
+		Cols == Eigen::Dynamic ||
+		((static_cast<std::size_t>(
+			Rows * Cols * sizeof(Scalar)) & 0xf) != 0));
+
+	using Type =
+		std::conditional_t<
+			UseAlignedAllocator,
+			std::vector<BlockType, Eigen::aligned_allocator<BlockType>>,
+			std::vector<BlockType>>;
 } ;
 
 

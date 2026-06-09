@@ -51,7 +51,7 @@ struct DiagonalMatrixWrapper < Type, false >
 	typedef typename Type::BlockPtr BlockPtr ;
 
 	DiagonalMatrixWrapper()
-	    : m_matrixPtr( BOGUS_NULL_PTR(const Type) )
+	    : m_matrixPtr( nullptr )
 	{ }
 	DiagonalMatrixWrapper( const Type& diag)
 	    : m_matrixPtr(&diag)
@@ -84,8 +84,8 @@ template <typename MType, typename DType, bool Precompute >
 struct DMtStorage {
 
 	DMtStorage()
-	    : m_M( BOGUS_NULL_PTR( const MType) ),
-	      m_D( BOGUS_NULL_PTR( const DType) )
+	    : m_M( nullptr ),
+	      m_D( nullptr )
 	{}
 
 	void compute( const MType& M, const DType& D ) {
@@ -109,7 +109,7 @@ template <typename MType, typename DType >
 struct DMtStorage< MType, DType, true >
 {
 	DMtStorage()
-	    : m_M( BOGUS_NULL_PTR( const MType) )
+	    : m_M( nullptr )
 	{}
 
 	void compute( const MType& M, const DType& D );

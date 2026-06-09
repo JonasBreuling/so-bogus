@@ -61,8 +61,7 @@ public:
 	template< typename Segment >
 	void dualityCOV( const unsigned , const Segment& ,
 	                 typename Traits::Vector& s ) const
-	{ }
-	// { s->setZero() ; }
+	{ s.setZero() ; }
 } ;
 
 

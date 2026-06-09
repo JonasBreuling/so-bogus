@@ -30,8 +30,7 @@ Krylov< BlockMatrixType, PreconditionerType >::Krylov(
 
 template < typename BlockMatrixType, template< typename BlockMatrixT > class PreconditionerType >
 Krylov< BlockMatrixType, PreconditionerType >::Krylov()
-	: Base( BOGUS_NULL_PTR(const BlockObjectBase< BlockMatrixType >),
-			100, NumTraits< Scalar >::epsilon() )
+	: Base( nullptr, 100, NumTraits< Scalar >::epsilon() )
 {
 }
 

@@ -26,7 +26,7 @@ namespace bogus
 template < typename BlockMatrixType >
 GaussSeidel< BlockMatrixType >& GaussSeidel< BlockMatrixType >::setMatrix( const BlockObjectBase< BlockMatrixType > & M )
 {
-	if( m_matrix != &M && ( m_matrix != BOGUS_NULL_PTR( const BlockObjectBase< BlockMatrixType >) ||
+	if( m_matrix != &M && ( m_matrix != nullptr ||
 							m_coloring.size() != (std::size_t) M.rowsOfBlocks() )) {
 		m_coloring.update( false, M.derived() );
 	}

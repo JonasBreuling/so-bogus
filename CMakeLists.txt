@@ -1,141 +1,205 @@
-cmake_minimum_required(VERSION 3.16)
-project(bogus LANGUAGES C CXX)
-
-option( EXAMPLES "Build examples" ON )
-option( TESTS "Build tests" OFF )
-option( APPS "Build apps" OFF )
-option( LIB "Build lib" ON )
-
-option( OPENMP "Use OpenMP" ON )
-option( BOOST_SERIALIZATION "Use boost::serialization" ON )
-option( MKL "Use mkl" OFF )
-
-option( WITH_2D "Build lib with 2d support" ON )
-option( WITH_3D "Build lib with 3d support" ON )
-option( WITH_DYNAMIC "Build lib with dynamic dim support" OFF )
-
-option( CPP11     "Build with c++11 standard" OFF )
-option( STRICT    "Treat warnings as errors (-Werror)" OFF )
-option( FAST_MATH "Enable unsafe compiler optimizations " ON )
-
-set( BOGUS_ROOT ${CMAKE_CURRENT_SOURCE_DIR} )
-set( CMAKE_MODULE_PATH ${BOGUS_ROOT}/cmake )
-
-set(CMAKE_CXX_STANDARD 17)
-
-# Eigen: Prefer system; fall back to FetchContent when network is available
-find_package(Eigen3 3.4...5.0.0 QUIET NO_MODULE)
+cmake_minimum_required(VERSION 3.14)
+ 
+project(bogus
+  VERSION       1.4.2
+  DESCRIPTION   "Sparse block-matrix library for Second Order Cone problems"
+  HOMEPAGE_URL  "https://github.com/JonasBreuling/so-bogus"
+  LANGUAGES     CXX
+)
+ 
+# ── Guard against in-source builds ───────────────────────────────────────────
+if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
+  message(FATAL_ERROR
+    "In-source builds are not supported.\n"
+    "Please create a separate build directory and run cmake from there.")
+endif()
+ 
+# ── Default build type ───────────────────────────────────────────────────────
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    Debug Release RelWithDebInfo MinSizeRel)
+  message(STATUS "Build type not set – defaulting to Release")
+endif()
+ 
+# ── Detect whether we are the top-level project ──────────────────────────────
+# When consumed via FetchContent the options default to OFF so we don't
+# build tests/apps/sobogus inside the consumer's project.
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+  set(_BOGUS_IS_TOPLEVEL ON)
+else()
+  set(_BOGUS_IS_TOPLEVEL OFF)
+endif()
+ 
+# ── Options ──────────────────────────────────────────────────────────────────
+option(BOGUS_BUILD_TESTS
+  "Build the bogus unit-test suite"             ${_BOGUS_IS_TOPLEVEL})
+option(BOGUS_BUILD_APPS
+  "Build the example applications"              ${_BOGUS_IS_TOPLEVEL})
+option(BOGUS_BUILD_SOBOGUS
+  "Build the compiled So-bogus interface layer" ${_BOGUS_IS_TOPLEVEL})
+option(BOGUS_BUILD_EXAMPLES
+  "Build more bogus examples"             	  	${_BOGUS_IS_TOPLEVEL})
+ 
+option(BOGUS_WITH_OPENMP
+  "Parallelise via OpenMP"                      ON)
+option(BOGUS_WITH_BOOST
+  "Enable boost::serialization I/O support"     ON)
+option(BOGUS_WITH_MKL
+  "Enable Intel MKL Block-Sparse-Row multiply"  OFF)
+ 
+# Dimension flags only affect the compiled So-bogus library
+option(BOGUS_WITH_2D
+  "Instantiate 2-D Second Order Cone solvers"   ON)
+option(BOGUS_WITH_3D
+  "Instantiate 3-D Second Order Cone solvers"   ON)
+option(BOGUS_WITH_DYNAMIC
+  "Instantiate dynamic-dimension SOC solvers"   OFF)
+ 
+# ── Custom finders (FindMKL, FindFCLib) ──────────────────────────
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+# Keep BOGUS_ROOT so the legacy finders can resolve relative search paths
+set(BOGUS_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+ 
+# ══════════════════════════════════════════════════════════════════════════════
+#  Header-only INTERFACE target  bogus::bogus
+# ══════════════════════════════════════════════════════════════════════════════
+add_library(bogus INTERFACE)
+add_library(bogus::bogus ALIAS bogus)
+ 
+# Require C++14 from consumers (Eigen 3.5+ (5.0+) demands it anyway)
+target_compile_features(bogus INTERFACE cxx_std_14)
+ 
+# Build-tree includes point at src/; installed tree includes point at
+# <prefix>/include/bogus/ so users always write  #include <Core/...>
+target_include_directories(bogus INTERFACE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+  $<INSTALL_INTERFACE:include/bogus>
+)
+ 
+# ── Eigen3 (required) ────────────────────────────────────────────────────────
+find_package(Eigen3 3.4...5.0.0 QUIET CONFIG)
 if(NOT Eigen3_FOUND)
     include(FetchContent)
     FetchContent_Declare(
-        Eigen3
+        Eigen
         GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
         GIT_TAG 5.0.0
         GIT_SHALLOW TRUE
     )
-    FetchContent_MakeAvailable(Eigen3)
+    FetchContent_MakeAvailable(Eigen)
 else()
     message(STATUS "Found system Eigen3: ${EIGEN3_VERSION}")
-    add_compile_definitions(EIGEN3_FOUND)
 endif()
-SET( EXTERNAL_INCLUDES ${EIGEN3_INCLUDE_DIR} )
-SET( EXTERNAL_LIBRARIES "" )
-
-# OpenMP
-if( OPENMP )
-	FIND_PACKAGE(OpenMP)
-	if(OPENMP_FOUND)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-		add_definitions(-DEIGEN_DONT_PARALLELIZE)
-	else()
-		set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unknown-pragmas " )
-	endif()
+target_link_libraries(bogus INTERFACE Eigen3::Eigen)
+message(STATUS "bogus: Eigen3 ${EIGEN3_VERSION} – OK")
+ 
+# ── OpenMP (optional) ─────────────────────────────────────────────────────────
+if(BOGUS_WITH_OPENMP)
+  find_package(OpenMP QUIET)
+  if(OpenMP_CXX_FOUND)
+    target_link_libraries(bogus INTERFACE OpenMP::OpenMP_CXX)
+    # Eigen's own parallelisation clashes with bogus's; disable it
+    target_compile_definitions(bogus INTERFACE EIGEN_DONT_PARALLELIZE)
+    message(STATUS "bogus: OpenMP ${OpenMP_CXX_VERSION} – enabled")
+  else()
+    message(STATUS "bogus: OpenMP not found – single-threaded build")
+    # Suppress spurious "unknown pragma omp" warnings
+    target_compile_options(bogus INTERFACE
+      $<$<OR:
+          $<CXX_COMPILER_ID:GNU>,
+          $<CXX_COMPILER_ID:Clang>,
+          $<CXX_COMPILER_ID:AppleClang>>:
+        -Wno-unknown-pragmas>)
+  endif()
 endif()
-
-# boost
-if( BOOST_SERIALIZATION )
-	find_package(Boost 1.36.0 COMPONENTS serialization)
-	if( Boost_FOUND )
-		add_definitions( -DBOGUS_WITH_BOOST_SERIALIZATION )
-		SET( EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} ${Boost_INCLUDE_DIR} )
-		SET( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${Boost_LIBRARIES} )
-	endif()
+ 
+# ── Boost serialization (optional) ───────────────────────────────────────────
+if(BOGUS_WITH_BOOST)
+  find_package(Boost 1.36 QUIET COMPONENTS serialization)
+  if(Boost_FOUND)
+    target_compile_definitions(bogus INTERFACE BOGUS_WITH_BOOST_SERIALIZATION)
+    target_link_libraries(bogus INTERFACE Boost::serialization)
+    message(STATUS "bogus: Boost::serialization ${Boost_VERSION} – enabled")
+  else()
+    message(STATUS "bogus: Boost not found – serialisation disabled")
+  endif()
 endif()
-
-# MKL
-if( MKL )
-	find_package( MKL )
-	if( MKL_FOUND )
-		add_definitions( -DBOGUS_WITH_MKL )
-		SET( EXTERNAL_INCLUDES ${EXTERNAL_INCLUDES} ${MKL_INCLUDE_DIRS} )
-		SET( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${MKL_LIBRARIES} mkl_intel_lp64 mkl_intel_thread mkl_core iomp5 )
-	endif()
+ 
+# ── Intel MKL (optional) ──────────────────────────────────────────────────────
+if(BOGUS_WITH_MKL)
+  find_package(MKL QUIET)     # uses cmake/FindMKL.cmake
+  if(MKL_FOUND)
+    target_compile_definitions(bogus INTERFACE BOGUS_WITH_MKL)
+    target_include_directories(bogus INTERFACE "${MKL_INCLUDE_DIRS}")
+    target_link_libraries(bogus INTERFACE
+      "${MKL_LIBRARIES}"
+      mkl_intel_lp64 mkl_intel_thread mkl_core iomp5)
+    message(STATUS "bogus: Intel MKL BSR bindings – enabled")
+  else()
+    message(STATUS "bogus: MKL not found – BSR bindings disabled")
+  endif()
 endif()
-
-# Build types and processor flags
-if (NOT CMAKE_BUILD_TYPE)
-  message(STATUS "No build type selected, default to Release")
-  set(CMAKE_BUILD_TYPE "Release")
+ 
+# ══════════════════════════════════════════════════════════════════════════════
+#  Sub-directories
+# ══════════════════════════════════════════════════════════════════════════════
+if(BOGUS_BUILD_SOBOGUS)
+  add_subdirectory(src)
 endif()
-
-if ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
-  set (CLANG TRUE)
-elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
-  set (GCC TRUE)
+ 
+if(BOGUS_BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(tests)
 endif()
-
-if ( GCC OR CLANG )
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra " )
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-ignored-attributes " ) #gcc 6 + eigen
-	if( CPP11 )
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations " )
-	endif()
-	if( STRICT )
-		SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror " )
-	endif()
-	if( FAST_MATH )
-		SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -ffast-math" )
-	endif()
-
-	if( GCC AND APPLE )
-		SET( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} stdc++ )
-	endif()
-
-	#Do not use -march=native on gcc < 4.3
-	SET(HANDLE_MARCH_NATIVE TRUE)
-	if (GCC)
-		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
-		if ( NOT GCC_VERSION VERSION_GREATER 4.3 AND NOT GCC_VERSION VERSION_EQUAL 4.3 )
-						SET(HANDLE_MARCH_NATIVE FALSE)
-		endif()
-
-	endif()
-
-	if( HANDLE_MARCH_NATIVE )
-		SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}  -march=native -DEIGEN_NO_DEBUG ")
-	else()
-		SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}  -msse -msse2 -DEIGEN_NO_DEBUG ")
-	endif()
+ 
+if(BOGUS_BUILD_APPS)
+  add_subdirectory(apps)
 endif()
-
-if( MSVC )
-	add_definitions( /DBOGUS_DONT_USE_BUILTIN_ATOMICS )
-	add_definitions( /wd4305 )
+ 
+if(BOGUS_BUILD_EXAMPLES)
+  add_subdirectory(examples)
 endif()
-
-include_directories( ${EXTERNAL_INCLUDES} )
-
-if( LIB )
-	add_subdirectory( src )
-endif()
-if( EXAMPLES )
-	add_subdirectory( examples )
-endif()
-if( TESTS )
-	enable_testing()
-	add_subdirectory( tests )
-endif()
-if( APPS )
-	add_subdirectory( apps )
-endif()
+ 
+# ══════════════════════════════════════════════════════════════════════════════
+#  Installation
+# ══════════════════════════════════════════════════════════════════════════════
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+ 
+# Install the bogus::bogus INTERFACE target
+install(TARGETS bogus
+  EXPORT bogus-targets)
+ 
+# Headers: Core and Extra land under  <prefix>/include/bogus/{Core,Extra}/
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/Core"
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bogus"
+  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+ 
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/src/Extra"
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bogus"
+  FILES_MATCHING PATTERN "*.hpp")
+ 
+# Version file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/bogus-config-version.cmake"
+  VERSION       ${PROJECT_VERSION}
+  COMPATIBILITY SameMajorVersion)
+ 
+# Config file (fills in @PACKAGE_INIT@ and paths)
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/bogus-config.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/bogus-config.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/bogus")
+ 
+# Export the targets file
+install(EXPORT bogus-targets
+  FILE        bogus-targets.cmake
+  NAMESPACE   bogus::
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/bogus")
+ 
+# Install config + version files
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/bogus-config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/bogus-config-version.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/bogus")

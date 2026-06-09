@@ -1,64 +1,68 @@
-cmake_minimum_required(VERSION 3.16)
+# ── Tests ─────────────────────────────────────────────────────────────────────
+# Pulls Google Test at configure time via FetchContent (no internet dependency
+# at build time after the first configure).
+# ─────────────────────────────────────────────────────────────────────────────
+cmake_minimum_required(VERSION 3.14)
 
-# Set CMP0135 to NEW to use the extraction time as the file timestamp
-cmake_policy(SET CMP0135 NEW)
+include(FetchContent)
 
-if( TESTS_NAMES )
-    SET( SRC_LIST ${TESTS_NAMES} )
-    MESSAGE( STATUS "Building tests: " ${SRC_LIST} )
-else()
-    execute_process( COMMAND ../updateCMakeSources.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
-    file(STRINGS CMakeSources.txt SRC_LIST)
-    MESSAGE( STATUS "Building all tests" )
-endif()
-
-include( ExternalProject )
-
-if( MSVC AND MSVC_VERSION EQUAL 1700 )
-  add_definitions( /D_VARIADIC_MAX=10 )
-  set( GTEST_PATCH_COMMAND patch < ${CMAKE_CURRENT_SOURCE_DIR}/gtest-msvc11.patch )
-  MESSAGE( STATUS "MSVC 2012 detected -- using gtest-msvc11.patch")
-else()
-  set( GTEST_PATCH_COMMAND "" )
-endif()
-
-if( MSVC )
-    set( GTEST_CMAKE_ARGS -Dgtest_force_shared_crt=ON )
-else()
-    set( GTEST_CMAKE_ARGS )
-endif()
-
-# Add gtest
-ExternalProject_Add(
+# ── Google Test v1.14.0 ───────────────────────────────────────────────────────
+FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/release-1.7.0.tar.gz
-  URL_MD5 4ff6353b2560df0afecfbda3b2763847
-  CMAKE_ARGS ${GTEST_CMAKE_ARGS}
-  UPDATE_COMMAND ""
-  PATCH_COMMAND ${GTEST_PATCH_COMMAND}
-  INSTALL_COMMAND ""
-  )
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG        v1.14.0
+  GIT_SHALLOW    TRUE          # fetch only the tag, not full history
+)
 
-SET( GTEST_LINK_LIBRARIES gtest gtest_main )
-if(UNIX)
-  SET( GTEST_LINK_LIBRARIES ${GTEST_LINK_LIBRARIES} pthread )
-endif()
+# Prevent gtest from hijacking our install() targets
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+# On Windows, link the CRT the same way the rest of the project does
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-ExternalProject_Get_Property(googletest source_dir)
-include_directories( ../src ${source_dir}/include)
+FetchContent_MakeAvailable(googletest)
 
-ExternalProject_Get_Property(googletest binary_dir)
-link_directories( ${binary_dir} )
+# ── Test sources ──────────────────────────────────────────────────────────────
+# All tests exercise the header-only bogus::bogus target directly;
+# they do not need the compiled sobogus library.
+set(BOGUS_TEST_SOURCES
+  ADMM.cpp
+  BlockMV.cpp
+  Flat.cpp
+  GaussSeidel.cpp
+  Krylov.cpp
+  Map.cpp
+  Mkl.cpp
+  Polynomial.cpp
+  ProductGaussSeidel.cpp
+  ProjectedGradient.cpp
+  Serialization.cpp
+  SparseBlock.cpp
+)
 
-add_executable(test${CMAKE_PROJECT_NAME} ${SRC_LIST})
-add_test( ${CMAKE_PROJECT_NAME} test${CMAKE_PROJECT_NAME} )
+list(TRANSFORM BOGUS_TEST_SOURCES PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 
-add_dependencies(test${CMAKE_PROJECT_NAME} googletest)
+# ── Test executable ───────────────────────────────────────────────────────────
+add_executable(testbogus ${BOGUS_TEST_SOURCES})
 
-# target_link_libraries(test${CMAKE_PROJECT_NAME} ${EXTERNAL_LIBRARIES} ${GTEST_LINK_LIBRARIES} )
-target_link_libraries(test${CMAKE_PROJECT_NAME}
-    PUBLIC
-      Eigen3::Eigen
-		  ${EXTERNAL_LIBRARIES}
-      ${GTEST_LINK_LIBRARIES}
+target_link_libraries(testbogus PRIVATE
+  bogus::bogus      # header-only Core + Extra, pulls Eigen / OpenMP / Boost
+  GTest::gtest_main # runner + main()
+)
+
+# Compiler warnings for the test binary (not propagated)
+# TODO: Fix this!
+# target_compile_options(testbogus PRIVATE
+#   $<$<OR:
+#       $<CXX_COMPILER_ID:GNU>,
+#       $<CXX_COMPILER_ID:Clang>,
+#       $<CXX_COMPILER_ID:AppleClang>>:
+#     -Wall -Wextra -Wno-ignored-attributes>
+#   $<$<CXX_COMPILER_ID:MSVC>:
+#     /W3 /wd4305>
+# )
+
+# ── Register with CTest ───────────────────────────────────────────────────────
+include(GoogleTest)
+gtest_discover_tests(testbogus
+  PROPERTIES TIMEOUT 120     # seconds per test case
 )

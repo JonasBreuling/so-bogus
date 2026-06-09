@@ -105,7 +105,7 @@ int main( int argc, const char* argv[] )
 	bogus::fclib::Options options ;
 	bool verbose = false ;
 
-	const char* file = BOGUS_NULL_PTR(const char) ;
+	const char* file = nullptr;
 
 	for( int i = 1 ; i < argc ; ++i )
 	{

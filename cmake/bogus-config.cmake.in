@@ -1,0 +1,27 @@
+@PACKAGE_INIT@
+
+# ── bogus-config.cmake ────────────────────────────────────────────────────────
+# Provides:
+#   bogus::bogus    – header-only Core + Extra  (MPL-2.0)
+#   bogus::sobogus  – compiled Interfaces layer (GPL-2.0), if installed
+#
+# Usage in a downstream CMakeLists.txt:
+#
+#   find_package(bogus 1.4 REQUIRED)
+#   target_link_libraries(myApp PRIVATE bogus::bogus)
+# ─────────────────────────────────────────────────────────────────────────────
+
+include(CMakeFindDependencyMacro)
+
+# Eigen3 is unconditionally required
+find_dependency(Eigen3 3.4...5.0.0 REQUIRED)
+if(NOT TARGET Eigen3::Eigen)
+  add_library(Eigen3::Eigen INTERFACE IMPORTED)
+  set_target_properties(Eigen3::Eigen PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${EIGEN3_INCLUDE_DIR}")
+endif()
+
+# Bring in the exported targets (bogus::bogus, and bogus::sobogus if present)
+include("${CMAKE_CURRENT_LIST_DIR}/bogus-targets.cmake")
+
+check_required_components(bogus)

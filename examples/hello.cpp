@@ -9,6 +9,9 @@
 
 #include "Extra/SecondOrder.impl.hpp"
 
+// #include "bogus/Core/Block.impl.hpp"
+#include <Extra/SOC/SOCLaw.impl.hpp>
+
 #include <Eigen/LU>
 #include <Eigen/Cholesky>
 

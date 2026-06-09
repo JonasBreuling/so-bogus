@@ -1,40 +1,61 @@
-execute_process( COMMAND ../updateCMakeSources.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} )
-file(STRINGS CMakeSources.txt SRC_LIST)
+# ── So-bogus compiled library ─────────────────────────────────────────────────
+#
+# Compiles only the three Interfaces .cpp files.  Everything else in src/ is
+# header-only and is consumed through bogus::bogus.
+#
+# License: GPL-2.0-or-later
+# ─────────────────────────────────────────────────────────────────────────────
 
-if( WITH_2D )
-	add_definitions( -DBOGUS_INSTANTIATE_2D_SOC )
-endif()
-if( WITH_3D )
-	add_definitions( -DBOGUS_INSTANTIATE_3D_SOC )
-endif()
-if( WITH_DYNAMIC )
-	add_definitions( -DBOGUS_INSTANTIATE_DYNAMIC_SOC )
-endif()
-
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -S --verbose-asm " )
-
-add_library(${CMAKE_PROJECT_NAME} 
-	SHARED 
-	${SRC_LIST}
-)
-target_link_libraries(${CMAKE_PROJECT_NAME}
-    PUBLIC
-        Eigen3::Eigen
-		${EXTERNAL_LIBRARIES}
+set(SOBOGUS_SOURCES
+  "${CMAKE_CURRENT_SOURCE_DIR}/Interfaces/FrictionProblem.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Interfaces/MecheInterface.cpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/Interfaces/PrimalFrictionProblem.cpp"
 )
 
-FOREACH(item ${SRC_LIST})
-	STRING(REGEX MATCH "^Interfaces/.+\\.hpp$" item ${item})
-	IF(item)
-		LIST(APPEND INTERFACES ${item})
-	ENDIF(item)
-ENDFOREACH(item ${SRC_LIST})
+add_library(sobogus SHARED ${SOBOGUS_SOURCES})
+add_library(bogus::sobogus ALIAS sobogus)
 
-INSTALL( DIRECTORY Core DESTINATION include/${CMAKE_PROJECT_NAME} )
-INSTALL( DIRECTORY Extra DESTINATION include/${CMAKE_PROJECT_NAME} )
-INSTALL( FILES ${INTERFACES} DESTINATION include/${CMAKE_PROJECT_NAME}/Interfaces )
-INSTALL( TARGETS ${CMAKE_PROJECT_NAME}
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION lib
-  ARCHIVE DESTINATION lib )
+# Inherit Eigen, OpenMP, Boost, MKL transitively from the INTERFACE target
+target_link_libraries(sobogus PUBLIC bogus::bogus)
 
+# SOC dimension instantiation (only affects this compiled unit)
+target_compile_definitions(sobogus PRIVATE
+  $<$<BOOL:${BOGUS_WITH_2D}>:BOGUS_INSTANTIATE_2D_SOC>
+  $<$<BOOL:${BOGUS_WITH_3D}>:BOGUS_INSTANTIATE_3D_SOC>
+  $<$<BOOL:${BOGUS_WITH_DYNAMIC}>:BOGUS_INSTANTIATE_DYNAMIC_SOC>
+)
+
+# Compiler warnings – applied only to this target, not propagated
+# TODO: Fix this
+# target_compile_options(sobogus PRIVATE
+#   $<$<OR:
+#       $<CXX_COMPILER_ID:GNU>,
+#       $<CXX_COMPILER_ID:Clang>,
+#       $<CXX_COMPILER_ID:AppleClang>>:
+#     -Wall -Wextra -Wno-ignored-attributes>
+#   $<$<CXX_COMPILER_ID:MSVC>:
+#     /W3 /wd4305>
+# )
+
+set_target_properties(sobogus PROPERTIES
+  VERSION                 ${PROJECT_VERSION}
+  SOVERSION               ${PROJECT_VERSION_MAJOR}
+  EXPORT_NAME             sobogus
+  POSITION_INDEPENDENT_CODE ON
+)
+
+# ── Install ───────────────────────────────────────────────────────────────────
+include(GNUInstallDirs)
+
+install(TARGETS sobogus
+  EXPORT   bogus-targets
+  LIBRARY  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  ARCHIVE  DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+  RUNTIME  DESTINATION "${CMAKE_INSTALL_BINDIR}"
+)
+
+# Interfaces headers alongside Core/Extra under <prefix>/include/bogus/
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Interfaces"
+  DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/bogus"
+  FILES_MATCHING PATTERN "*.hpp"
+)

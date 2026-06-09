@@ -38,7 +38,7 @@ int main( int argc, const char* argv[] )
 	bogus::MecheFrictionProblem::Options options ;
 	options.tryZeroAsWell = false ;
 
-	const char* file = BOGUS_NULL_PTR(const char) ;
+	const char* file = nullptr;
 	double problemRegularization = 0. ;
 	bool staticPb = false ;
 	bool old = false ;
@@ -124,7 +124,7 @@ int main( int argc, const char* argv[] )
 
 	bogus::MecheFrictionProblem mfp ;
 
-	double * r = BOGUS_NULL_PTR(double) ;
+	double * r = nullptr;
 	if( mfp.fromFile( file, r, old ) )
 	{
 

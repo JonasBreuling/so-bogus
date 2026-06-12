@@ -69,8 +69,8 @@ SparseBlockMatrixBase< Derived >::SparseBlockMatrixBase()
     : Base()
 {
 	//Resize to zero
-	setRows( 0, BOGUS_NULL_PTR(const unsigned) ) ;
-	setCols( 0, BOGUS_NULL_PTR(const unsigned) ) ;
+	setRows( 0, nullptr ) ;
+	setCols( 0, nullptr ) ;
 	m_transposeIndex.resizeOuter(0) ;
 	m_transposeIndex.valid = false ;
 }
@@ -351,18 +351,6 @@ Derived& SparseBlockMatrixBase< Derived >::prune( const Scalar precision )
 	return derived() ;
 }
 
-// TODO: This is now implemented in Eigen and can be removed
-// namespace perm_impl {
-// template< typename T, typename U >
-// typename EnableIf<U::RowsAtCompileTime == T::RowsAtCompileTime, void >::ReturnType
-// swap( T t, U u )
-// {
-// 	using std::swap ;
-// 	for( unsigned i = 0 ; i < u.rows() ; ++i )
-// 		swap( t[i], u[i] ) ;
-// }
-// }
-
 template < typename IndexT, typename ArrayT >
 void applyPermutation( const IndexT n, const IndexT* permutation, ArrayT& array )
 {
@@ -441,7 +429,7 @@ Derived& SparseBlockMatrixBase< Derived >::applyPermutation( const std::size_t* 
 	m_majorIndex = destIndex ;
 	assert( m_majorIndex.valid ) ;
 
-	bogus::applyPermutation( nBlocks(), data_pointer(blocksPermutation), m_blocks ) ;
+	bogus::applyPermutation( nBlocks(), blocksPermutation.data(), m_blocks ) ;
 
 	m_minorIndex.valid = empty() ;
 

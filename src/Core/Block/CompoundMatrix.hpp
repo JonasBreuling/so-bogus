@@ -87,7 +87,7 @@ public:
 	Index colsOfBlocks() const { return m_first.colsOfBlocks() + m_second.colsOfBlocks() ; }
 
 	const Index *rowOffsets( ) const { return m_first.rowOffsets() ; }
-	const Index *colOffsets( ) const { return data_pointer(m_offsets) ; }
+	const Index *colOffsets( ) const { return m_offsets.data() ; }
 
 	ConstTransposeReturnType transpose() const { return Transpose< CompoundBlockMatrix >( *this ) ; }
 
@@ -145,14 +145,13 @@ struct BlockMatrixTraits< CompoundBlockMatrix< ColWise, MatrixT1, MatrixT2 > >
 	typedef typename OrigTraits::Scalar   Scalar;
 	typedef typename OrigTraits::Index    Index;
 
-	enum {
-		RowsPerBlock = SwapIf<
-		     ColWise || ((int)OrigTraits::RowsPerBlock) == (int)OtherTraits::RowsPerBlock,
-		    internal::DYNAMIC, OrigTraits::RowsPerBlock >::First,
-		ColsPerBlock = SwapIf<
-		    !ColWise || ((int)OrigTraits::ColsPerBlock) == (int)OtherTraits::ColsPerBlock,
-		    internal::DYNAMIC, OrigTraits::ColsPerBlock >::First
-	};
+	static constexpr int RowsPerBlock = (ColWise || OrigTraits::RowsPerBlock == OtherTraits::RowsPerBlock)
+			? OrigTraits::RowsPerBlock
+			: internal::DYNAMIC;
+
+	static constexpr int ColsPerBlock = (!ColWise || OrigTraits::ColsPerBlock == OtherTraits::ColsPerBlock)
+			? OrigTraits::ColsPerBlock
+			: internal::DYNAMIC;
 } ;
 
 template< typename MatrixT1, typename MatrixT2  >
@@ -184,7 +183,7 @@ public:
 	Index rowsOfBlocks() const { return m_first.rowsOfBlocks() + m_second.rowsOfBlocks() ; }
 
 	const Index *colOffsets( ) const { return m_first.colOffsets() ; }
-	const Index *rowOffsets( ) const { return data_pointer(m_offsets) ; }
+	const Index *rowOffsets( ) const { return m_offsets.data() ; }
 
 	ConstTransposeReturnType transpose() const { return Transpose< CompoundBlockMatrix >( *this ) ; }
 

@@ -19,8 +19,10 @@
 #define BOGUS_DONT_PARALLELIZE
 #endif
 
+// TODO: This should be aligned with eigen!!!
 #ifndef BOGUS_DEFAULT_INDEX_TYPE
-#define BOGUS_DEFAULT_INDEX_TYPE Eigen::Index
+// #define BOGUS_DEFAULT_INDEX_TYPE Eigen::Index
+#define BOGUS_DEFAULT_INDEX_TYPE int
 #endif
 
 #ifndef BOGUS_DEFAULT_BLOCK_PTR_TYPE
@@ -48,7 +50,7 @@ namespace flags
 		NONE = 0,
 		//! Use an uncompressed index
 		/*! This removes some restrictions on the order in which elements can be inserted,
-			but can be less efficient and will dsallow interoperability with other formats
+			but can be less efficient and will disallow interoperability with other formats
 			such as MKL's BSR.
 			<b>If the matrix can be created in a compressed way, that is with all its elements inserted
 			in order, you probably should not set the UNCOMPRESSED flag. </b>

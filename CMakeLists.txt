@@ -91,8 +91,19 @@ if(NOT Eigen3_FOUND)
 else()
     message(STATUS "Found system Eigen3: ${EIGEN3_VERSION}")
 endif()
-target_link_libraries(bogus INTERFACE Eigen3::Eigen)
+# target_link_libraries(bogus INTERFACE Eigen3::Eigen)
+# message(STATUS "bogus: Eigen3 ${EIGEN3_VERSION} – OK")
+
+# IMPORTED targets (Eigen3::Eigen, OpenMP::OpenMP_CXX, Boost::serialization …)
+# cannot appear in an install() export set.  Wrap them in BUILD_INTERFACE so
+# they are used during the build but are NOT written into bogus-targets.cmake.
+# bogus-config.cmake.in calls find_dependency() to recreate them on the
+# consumer side and then re-attaches them via set_property().
+target_link_libraries(bogus INTERFACE
+  $<BUILD_INTERFACE:Eigen3::Eigen>)
 message(STATUS "bogus: Eigen3 ${EIGEN3_VERSION} – OK")
+# Record for substitution into bogus-config.cmake.in
+set(BOGUS_EIGEN3_VERSION "${EIGEN3_VERSION}")
  
 # ── OpenMP (optional) ─────────────────────────────────────────────────────────
 if(BOGUS_WITH_OPENMP)

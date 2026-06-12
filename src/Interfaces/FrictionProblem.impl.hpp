@@ -36,7 +36,7 @@ void applyPermutation(
 		)
 {
 	Segmenter< Dimension, EigenDerived, Index > segmenter( vec.derived(), offsets ) ;
-	bogus::applyPermutation( permutation.size(), data_pointer(permutation), segmenter ) ;
+	bogus::applyPermutation( permutation.size(), permutation.data(), segmenter ) ;
 }
 
 

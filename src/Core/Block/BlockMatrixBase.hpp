@@ -90,9 +90,9 @@ public:
 	//! Access to blocks data
 	const typename Traits::BlocksArrayType& blocks() const { return  m_blocks ; }
 	//! Access to blocks data as a raw pointer
-	const BlockType* data() const { return  data_pointer(m_blocks) ; }
+	const BlockType* data() const { return  m_blocks.data() ; }
 	//! Access to blocks data as a raw pointer
-	BlockType* data() { return data_pointer(m_blocks) ; }
+	BlockType* data() { return m_blocks.data() ; }
 
 	//! \warning block has to exist
 	BlockRef diagonal( const Index row )

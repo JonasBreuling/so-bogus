@@ -119,35 +119,6 @@ private:
 	std::size_t    m_size ;
 } ;
 
-template< typename Element >
-inline const Element* data_pointer( const ConstMappedArray< Element >& vec )
-{
-	return vec.data() ;
-}
-
-//! Accessing std::vector data pointer without undefined behavior
-template <typename T, typename Allocator>
-inline const T* data_pointer( const std::vector<T, Allocator>& vec )
-{
-#if BOGUS_HAS_CPP11
-	return vec.data() ;
-#else
-	return vec.empty() ? BOGUS_NULL_PTR( const T ) : &vec[0] ;
-#endif
-}
-
-//! Accessing std::vector data pointer without undefined behavior -- mutable version
-template <typename T, typename Allocator>
-inline T* data_pointer( std::vector<T, Allocator>& vec )
-{
-#if BOGUS_HAS_CPP11
-	return vec.data() ;
-#else
-	return vec.empty() ? BOGUS_NULL_PTR( T ) : &vec[0] ;
-#endif
-}
-
-
 template< typename Scalar>
 struct ConstantArray {
 	const Scalar s ;

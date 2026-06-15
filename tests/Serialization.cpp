@@ -70,8 +70,6 @@ TEST( Serialization, Eigen )
 	ASSERT_EQ( rv, rv_ ) ;
 }
 
-#ifdef BOGUS_WITH_EIGEN_STABLE_SPARSE_API
-
 TEST( Serialization, EigenSparse )
 {
 	Eigen::SparseMatrix< double > sm ( 3, 3 ) ;
@@ -96,7 +94,6 @@ TEST( Serialization, EigenSparse )
 
 	ASSERT_EQ( Eigen::Vector3d( 1., 2., 3.), sm_ * Eigen::Vector3d::Ones() ) ;
 }
-#endif // EIGEN >=3.1
 
 TEST( Serialization, SparseBlockMatrix )
 {

@@ -18,34 +18,14 @@
 	See Eigen/src/Sparse/SimplicialCholesky.h for more information
 */
 
-#include "SparseHeader.hpp"
-
-#define BOGUS_WITH_EIGEN_STABLE_SPARSE_API
-#ifdef BOGUS_WITH_EIGEN_STABLE_SPARSE_API
+#include <Eigen/Sparse>
 
 #include "EigenLinearSolvers.hpp"
 #include "../Utils/LinearSolverBase.hpp"
 
 #include <Eigen/OrderingMethods>
-
-
-#ifndef EIGEN_MPL2_ONLY
 #include <Eigen/SparseCholesky>
-#define BOGUS_WITH_EIGEN_SPARSE_LDLT
-#endif
-
-#if EIGEN_VERSION_AT_LEAST(3,1,92)
 #include <Eigen/SparseLU>
-#define BOGUS_WITH_EIGEN_SPARSE_LU
-#endif
-
-#ifndef BOGUS_EIGEN_SPARSE_LDLT_IMPL
-#define BOGUS_EIGEN_SPARSE_LDLT_IMPL(Derived) Eigen::SimplicialLDLT<Derived>
-#endif
-
-#ifndef BOGUS_EIGEN_SPARSE_LU_IMPL
-#define BOGUS_EIGEN_SPARSE_LU_IMPL(Derived) Eigen::SparseLU<Derived, Eigen::COLAMDOrdering<int> >
-#endif
 
 namespace bogus {
 
@@ -56,7 +36,7 @@ struct LinearSolverTraits< Factorization< Eigen::SparseMatrixBase< Derived >, Im
 	typedef ImplType FactType ;
 
 	template < typename RhsT > struct Result {
-		typedef typename EigenSolveResult< FactType, RhsT >::Type Type ;
+	  	typedef const Eigen::Solve< FactType, RhsT > Type ;
 	} ;
 	template < typename RhsT >
 	struct Result< Eigen::MatrixBase< RhsT > > {
@@ -120,25 +100,14 @@ struct EigenSparseFactorization : public Factorization<
 
 // LDLT
 
-#ifdef BOGUS_WITH_EIGEN_SPARSE_LDLT
-#if ! EIGEN_VERSION_AT_LEAST(3,2,90)
-template < typename MatrixType, typename RhsType >
-struct EigenSolveResult< Eigen::SimplicialLDLT< MatrixType >, RhsType >
-{
-	typedef Eigen::SimplicialLDLT< MatrixType > FactType ;
-	typedef Eigen::internal::solve_retval< Eigen::SimplicialCholeskyBase< FactType >, RhsType > Type ;
-};
-#endif
-#endif
-
 template < typename Derived >
 struct LinearSolverTraits< LDLT< Eigen::SparseMatrixBase< Derived > > >
-		: public LinearSolverTraits< Factorization<Eigen::SparseMatrixBase<Derived>, BOGUS_EIGEN_SPARSE_LDLT_IMPL(Derived) > >
+		: public LinearSolverTraits< Factorization<Eigen::SparseMatrixBase<Derived>, Eigen::SimplicialLDLT< Derived > > >
 {
 } ;
 template < typename Derived >
 struct LinearSolverTraits< LU< Eigen::SparseMatrixBase< Derived > > >
-		: public LinearSolverTraits< Factorization<Eigen::SparseMatrixBase<Derived>, BOGUS_EIGEN_SPARSE_LU_IMPL(Derived) > >
+		: public LinearSolverTraits< Factorization<Eigen::SparseMatrixBase<Derived>, Eigen::SparseLU< Derived,  Eigen::COLAMDOrdering<int>> > >
 {
 } ;
 
@@ -200,7 +169,5 @@ struct SparseLU : public LU< Eigen::SparseMatrixBase< Eigen::SparseMatrix< Scala
 
 
 } //namespace bogus
-
-#endif // EIGEN_STABLE_API
 
 #endif //HPP

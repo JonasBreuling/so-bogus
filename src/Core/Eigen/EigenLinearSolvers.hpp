@@ -19,16 +19,6 @@
 
 namespace bogus {
 
-template<typename Decomposition, typename RhsType>
-struct EigenSolveResult
-{
-#if EIGEN_VERSION_AT_LEAST(3,2,90)
-	  typedef const Eigen::Solve< Decomposition, RhsType > Type ;
-#else
-	  typedef Eigen::internal::solve_retval< Decomposition, RhsType > Type ;
-#endif
-};
-
 template < typename Derived >
 struct LinearSolverTraits< LU< Eigen::MatrixBase< Derived > > >
 {
@@ -36,7 +26,7 @@ struct LinearSolverTraits< LU< Eigen::MatrixBase< Derived > > >
 	typedef Eigen::FullPivLU< MatrixType > FactType ;
 
 	template < typename RhsT > struct Result {
-		typedef typename EigenSolveResult< FactType, RhsT >::Type Type ;
+	  	typedef const Eigen::Solve< FactType, RhsT > Type ;
 	} ;
 	template < typename RhsT >
 	struct Result< Eigen::MatrixBase< RhsT > > {
@@ -99,7 +89,7 @@ struct LinearSolverTraits< LDLT< Eigen::MatrixBase< Derived > > >
 	typedef Eigen::LDLT< MatrixType > FactType ;
 
 	template < typename RhsT > struct Result {
-		typedef typename EigenSolveResult< FactType, RhsT >::Type Type ;
+	  	typedef const Eigen::Solve< FactType, RhsT > Type ;
 	} ;
 	template < typename RhsT >
 	struct Result< Eigen::MatrixBase< RhsT > > {

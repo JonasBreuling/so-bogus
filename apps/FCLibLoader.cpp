@@ -100,8 +100,6 @@ static double solve( const fclib_local* problem,
 
 int main( int argc, const char* argv[] )
 {
-#ifdef BOGUS_WITH_EIGEN_STABLE_SPARSE_API
-
 	bogus::fclib::Options options ;
 	bool verbose = false ;
 
@@ -292,15 +290,5 @@ int main( int argc, const char* argv[] )
 	if( solution ) fclib_delete_solutions (solution, 1);
 	if( guesses ) fclib_delete_solutions (guesses, n_guesses);
 
-
 	return 0 ;
-
-#else
-	(void) argc, (void) argv ;
-
-	std::cerr<< "FCLibLoader requires Eigen's stable sparse API ( >= 3.1 )" << std::endl ;
-	return -1 ;
-#endif
-
-
 }

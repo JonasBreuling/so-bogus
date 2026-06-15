@@ -71,7 +71,6 @@ Core/Eigen/EigenProblemTraits.hpp
 Core/Eigen/EigenSerialization.hpp
 Core/Eigen/EigenSparseLinearSolvers.hpp
 Core/Eigen/SparseConversions.hpp
-Core/Eigen/SparseHeader.hpp
 Core/Utils/CppTools.hpp
 Core/Utils/LinearSolverBase.hpp
 Core/Utils/Lock.hpp

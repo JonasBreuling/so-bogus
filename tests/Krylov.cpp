@@ -196,8 +196,6 @@ TEST( Krylov, Preconditioner )
 	EXPECT_GT( 1.e-16, err ) ;
 	EXPECT_GT( 1.e-16, ( sbm*res - rhs ).squaredNorm() ) ;
 
-#ifdef BOGUS_WITH_EIGEN_STABLE_SPARSE_API
-
 	res.setZero() ;
 	bogus::Krylov< SparseMat, bogus::DiagonalPreconditioner > spcg( ssbm ) ;
 	ri.setMethodName("CG");
@@ -205,7 +203,6 @@ TEST( Krylov, Preconditioner )
 	EXPECT_GT( 1.e-16, err ) ;
 	EXPECT_GT( 1.e-16, ( sbm*res - rhs ).squaredNorm() ) ;
 
-#ifdef BOGUS_WITH_EIGEN_SPARSE_LDLT
 	res.setZero() ;
 	bogus::Krylov< SparseMat, bogus::DiagonalLDLTPreconditioner > sldltcg( ssbm ) ;
 	sldltcg.setMaxIters( 1 );
@@ -219,9 +216,7 @@ TEST( Krylov, Preconditioner )
 	err = sldltcg.solve_BiCGSTAB( rhs, res ) ;
 	EXPECT_GT( 1.e-16, err ) ;
 	EXPECT_GT( 1.e-16, ( sbm*res - rhs ).squaredNorm() ) ;
-#endif
 
-#ifdef BOGUS_WITH_EIGEN_SPARSE_LU
 	res.setZero() ;
 	bogus::Krylov< SparseMat, bogus::DiagonalLUPreconditioner > slucg( ssbm ) ;
 	slucg.setMaxIters( 1 );
@@ -235,9 +230,6 @@ TEST( Krylov, Preconditioner )
 	err = slucg.solve_BiCGSTAB( rhs, res ) ;
 	EXPECT_GT( 1.e-16, err ) ;
 	EXPECT_GT( 1.e-16, ( sbm*res - rhs ).squaredNorm() ) ;
-#endif
-
-#endif
 
 #endif
 }

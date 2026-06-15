@@ -12,10 +12,7 @@
 #define BOGUS_EIGEN_SERIALIZATION_HPP
 
 #include <Eigen/Core>
-
-#ifndef BOGUS_BLOCK_WITHOUT_EIGEN_SPARSE
-#include "SparseHeader.hpp"
-#endif
+#include <Eigen/Sparse>
 
 namespace boost
 {
@@ -139,8 +136,6 @@ inline void serialize(
 	split_free( ar, matrix, file_version ) ;
 }
 
-#ifdef BOGUS_WITH_EIGEN_STABLE_SPARSE_API
-
 template<typename Archive, typename _Scalar, int _Options, typename _Index >
 inline void load(
 	   Archive & ar,
@@ -190,8 +185,6 @@ inline void serialize(
 {
 	split_free( ar, matrix, file_version ) ;
 }
-
-#endif
 
 } // serialization
 } // boost

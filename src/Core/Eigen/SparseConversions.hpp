@@ -12,7 +12,7 @@
 #ifndef BOGUS_EIGEN_SPARSE_CONVERSIONS_HPP
 #define BOGUS_EIGEN_SPARSE_CONVERSIONS_HPP
 
-#include "SparseHeader.hpp"
+#include <Eigen/Sparse>
 
 #include "../Block/SparseBlockMatrix.hpp"
 #include "../Block/Access.hpp"

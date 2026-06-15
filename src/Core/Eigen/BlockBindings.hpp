@@ -18,10 +18,7 @@
 #define BLOCK_EIGENBINDINGS_HPP
 
 #include <Eigen/Core>
-
-#ifndef BOGUS_BLOCK_WITHOUT_EIGEN_SPARSE
-#include "SparseHeader.hpp"
-#endif
+#include <Eigen/Sparse>
 
 #include "../Block/BlockMatrixBase.hpp"
 #include "../Block/Expressions.hpp"

@@ -22,13 +22,13 @@ struct SparseBlockIndexTraits {};
 
 template <typename Derived>
 struct SparseBlockIndexBase {
-  typedef SparseBlockIndexTraits<Derived> Traits;
-  typedef typename Traits::Index Index;
-  typedef typename Traits::InnerIterator InnerIterator;
+  using Traits = SparseBlockIndexTraits<Derived>;
+  using Index = typename Traits::Index;
+  using InnerIterator = typename Traits::InnerIterator;
 
   //! Type of the array encoding the size of each block of the inner dimension.
   /*! which can be retrieved as \code innerOffsets[inner+1] - innerOffsets[inner] \endcode */
-  typedef std::vector<Index> InnerOffsetsType;
+  using InnerOffsetsType = std::vector<Index>;
 
   //! Whether this index is currently valid
   bool valid;
@@ -75,18 +75,18 @@ struct SparseBlockIndexBase {
 template <bool Compressed, typename Index_, typename BlockPtr_ = Index_,
           template <typename> class ArrayType = ResizableSequenceContainer>
 struct SparseBlockIndex : public SparseBlockIndexBase<SparseBlockIndex<Compressed, Index_, BlockPtr_, ArrayType> > {
-  typedef Index_ Index;
-  typedef BlockPtr_ BlockPtr;
+  using Index = Index_;
+  using BlockPtr = BlockPtr_;
 
-  typedef SparseBlockIndexBase<SparseBlockIndex<Compressed, Index_, BlockPtr_, ArrayType> > Base;
-  typedef typename Base::InnerOffsetsType InnerOffsetsType;
-  typedef typename Base::InnerIterator InnerIterator;
+  using Base = SparseBlockIndexBase<SparseBlockIndex<Compressed, Index_, BlockPtr_, ArrayType> >;
+  using InnerOffsetsType = typename Base::InnerOffsetsType;
+  using InnerIterator = typename Base::InnerIterator;
   using Base::valid;
 
   //! Vector of ( inner index ; block pointer ) tuples encoding an inner vector
-  typedef std::vector<std::pair<Index, BlockPtr> > Inner;
+  using Inner = std::vector<std::pair<Index, BlockPtr> >;
   //! Vector of inner vectors
-  typedef typename ArrayType<Inner>::Type Outer;
+  using Outer = typename ArrayType<Inner>::Type;
 
   InnerOffsetsType innerOffsets;
   Outer outer;
@@ -173,7 +173,7 @@ struct SparseBlockIndex : public SparseBlockIndexBase<SparseBlockIndex<Compresse
 
   Index nonZeros() const {
     Index nnz = 0;
-    for (unsigned i = 0; i < outer.size(); ++i) nnz += outer[i].size();
+    for (const auto& innerVec : outer) nnz += innerVec.size();
 
     return nnz;
   }
@@ -183,20 +183,20 @@ struct SparseBlockIndex : public SparseBlockIndexBase<SparseBlockIndex<Compresse
 
 template <bool Compressed, typename Index_, typename BlockPtr_, template <typename> class ArrayType>
 struct SparseBlockIndexTraits<SparseBlockIndex<Compressed, Index_, BlockPtr_, ArrayType> > {
-  typedef Index_ Index;
-  typedef BlockPtr_ BlockPtr;
+  using Index = Index_;
+  using BlockPtr = BlockPtr_;
 
-  typedef SparseBlockIndex<Compressed, Index_, BlockPtr_, ArrayType> SparseBlockIndexType;
+  using SparseBlockIndexType = SparseBlockIndex<Compressed, Index_, BlockPtr_, ArrayType>;
 
   //! Forward iterator
   struct InnerIterator {
     // Warning: This class does not implement the full RandomAccessIterator concept ;
     // only the operations that are required by std::lower_bound are implemented
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef Index value_type;
-    typedef std::ptrdiff_t difference_type;
-    typedef const Index* pointer;
-    typedef const Index& reference;
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = Index;
+    using difference_type = std::ptrdiff_t;
+    using pointer = const Index*;
+    using reference = const Index&;
 
     InnerIterator() {}
 

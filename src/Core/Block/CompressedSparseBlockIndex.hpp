@@ -20,16 +20,16 @@ namespace bogus {
 template <typename Index_, typename BlockPtr_, template <typename> class ArrayType>
 struct SparseBlockIndex<true, Index_, BlockPtr_, ArrayType>
     : public SparseBlockIndexBase<SparseBlockIndex<true, Index_, BlockPtr_, ArrayType> > {
-  typedef Index_ Index;
-  typedef BlockPtr_ BlockPtr;
+  using Index = Index_;
+  using BlockPtr = BlockPtr_;
 
-  typedef SparseBlockIndexBase<SparseBlockIndex<true, Index_, BlockPtr_, ArrayType> > Base;
-  typedef typename Base::InnerOffsetsType InnerOffsetsType;
-  typedef typename Base::InnerIterator InnerIterator;
+  using Base = SparseBlockIndexBase<SparseBlockIndex<true, Index_, BlockPtr_, ArrayType> >;
+  using InnerOffsetsType = typename Base::InnerOffsetsType;
+  using InnerIterator = typename Base::InnerIterator;
   using Base::valid;
 
-  typedef typename ArrayType<Index>::Type Inner;
-  typedef typename ArrayType<Index>::Type Outer;
+  using Inner = typename ArrayType<Index>::Type;
+  using Outer = typename ArrayType<Index>::Type;
 
   InnerOffsetsType innerOffsets;
 
@@ -145,20 +145,20 @@ struct SparseBlockIndex<true, Index_, BlockPtr_, ArrayType>
 
 template <typename Index_, typename BlockPtr_, template <typename> class ArrayType>
 struct SparseBlockIndexTraits<SparseBlockIndex<true, Index_, BlockPtr_, ArrayType> > {
-  typedef Index_ Index;
-  typedef BlockPtr_ BlockPtr;
+  using Index = Index_;
+  using BlockPtr = BlockPtr_;
 
-  typedef SparseBlockIndex<true, Index_, BlockPtr_, ArrayType> SparseBlockIndexType;
+  using SparseBlockIndexType = SparseBlockIndex<true, Index_, BlockPtr_, ArrayType>;
 
   //! Forward iterator
   struct InnerIterator {
     // Warning: This class does not implement the full RandomAccessIterator concept ;
     // only the operations that are required by std::lower_bound are implemented
-    typedef std::random_access_iterator_tag iterator_category;
-    typedef Index value_type;
-    typedef ptrdiff_t difference_type;
-    typedef const Index* pointer;
-    typedef const Index& reference;
+    using iterator_category = std::random_access_iterator_tag;
+    using value_type = Index;
+    using difference_type = ptrdiff_t;
+    using pointer = const Index*;
+    using reference = const Index&;
 
     InnerIterator() : m_inner(nullptr) {}
 

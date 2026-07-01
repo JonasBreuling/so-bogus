@@ -39,7 +39,7 @@ struct CompoundBlockMatrixBase<ColWise, MatrixT1, MatrixT1>
     : public IterableBlockObject<CompoundBlockMatrix<ColWise, MatrixT1, MatrixT1> > {
   template <typename OtherBlockType, bool PreserveSymmetry = true, bool SwitchDirection = false>
   struct MutableImpl {
-    typedef typename MatrixT1::template MutableImpl<OtherBlockType, PreserveSymmetry, SwitchDirection>::Type Type;
+    using Type = typename MatrixT1::template MutableImpl<OtherBlockType, PreserveSymmetry, SwitchDirection>::Type;
   };
 };
 
@@ -47,8 +47,8 @@ template <typename MatrixT1, typename MatrixT2>
 struct SameBlockMatrixTraits {};
 template <typename MatrixT1>
 struct SameBlockMatrixTraits<MatrixT1, MatrixT1> {
-  typedef BlockMatrixTraits<MatrixT1> CommonTraits;
-  typedef typename CommonTraits::BlockType BlockType;
+  using CommonTraits = BlockMatrixTraits<MatrixT1>;
+  using BlockType = typename CommonTraits::BlockType;
 };
 }  // namespace internal
 
@@ -56,11 +56,11 @@ template <bool ColWise, typename MatrixT1, typename MatrixT2>
 class CompoundBlockMatrix : public internal::CompoundBlockMatrixBase<ColWise, MatrixT1, MatrixT2> {
  public:
   // side-by-side (ColWise = true)
-  typedef IterableBlockObject<CompoundBlockMatrix<ColWise, MatrixT1, MatrixT2> > Base;
+  using Base = IterableBlockObject<CompoundBlockMatrix<ColWise, MatrixT1, MatrixT2> >;
 
-  typedef typename Base::Index Index;
-  typedef typename Base::Scalar Scalar;
-  typedef typename Base::ConstTransposeReturnType ConstTransposeReturnType;
+  using Index = typename Base::Index;
+  using Scalar = typename Base::Scalar;
+  using ConstTransposeReturnType = typename Base::ConstTransposeReturnType;
 
   CompoundBlockMatrix(const IterableBlockObject<MatrixT1>& first, const IterableBlockObject<MatrixT2>& second);
 
@@ -128,11 +128,11 @@ template <bool ColWise, typename MatrixT1, typename MatrixT2>
 struct BlockMatrixTraits<CompoundBlockMatrix<ColWise, MatrixT1, MatrixT2> >
     : public BlockMatrixTraits<BlockObjectBase<CompoundBlockMatrix<ColWise, MatrixT1, MatrixT2> > >,
       internal::SameBlockMatrixTraits<MatrixT1, MatrixT2> {
-  typedef BlockMatrixTraits<MatrixT1> OrigTraits;
-  typedef BlockMatrixTraits<MatrixT2> OtherTraits;
+  using OrigTraits = BlockMatrixTraits<MatrixT1>;
+  using OtherTraits = BlockMatrixTraits<MatrixT2>;
 
-  typedef typename OrigTraits::Scalar Scalar;
-  typedef typename OrigTraits::Index Index;
+  using Scalar = typename OrigTraits::Scalar;
+  using Index = typename OrigTraits::Index;
 
   static constexpr int RowsPerBlock =
       (ColWise || OrigTraits::RowsPerBlock == OtherTraits::RowsPerBlock) ? OrigTraits::RowsPerBlock : internal::DYNAMIC;
@@ -147,11 +147,11 @@ class CompoundBlockMatrix<false, MatrixT1, MatrixT2>
     : public internal::CompoundBlockMatrixBase<false, MatrixT1, MatrixT2> {
  public:
   // one-atop-the-other (ColWise = false)
-  typedef IterableBlockObject<CompoundBlockMatrix<false, MatrixT1, MatrixT2> > Base;
+  using Base = IterableBlockObject<CompoundBlockMatrix<false, MatrixT1, MatrixT2> >;
 
-  typedef typename Base::Index Index;
-  typedef typename Base::Scalar Scalar;
-  typedef typename Base::ConstTransposeReturnType ConstTransposeReturnType;
+  using Index = typename Base::Index;
+  using Scalar = typename Base::Scalar;
+  using ConstTransposeReturnType = typename Base::ConstTransposeReturnType;
 
   CompoundBlockMatrix(const IterableBlockObject<MatrixT1>& first, const IterableBlockObject<MatrixT2>& second);
 

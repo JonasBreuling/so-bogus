@@ -55,8 +55,8 @@ struct CompoundMultiplier<false, DoTranspose> {  // colwise compound transposed 
   template <typename MatrixT1, typename MatrixT2, typename RhsT, typename ResT, typename Scalar>
   static void multiply(const CompoundBlockMatrix<DoTranspose, MatrixT1, MatrixT2>& mat, const RhsT& rhs, ResT& res,
                        Scalar alpha = 1, Scalar beta = 0) {
-    typedef Segmenter<internal::DYNAMIC, ResT, typename CompoundBlockMatrix<DoTranspose, MatrixT1, MatrixT2>::Index>
-        SegmenterType;
+    using SegmenterType =
+        Segmenter<internal::DYNAMIC, ResT, typename CompoundBlockMatrix<DoTranspose, MatrixT1, MatrixT2>::Index>;
     SegmenterType resSeg(res, mat.compoundOffsets());
 
     typename SegmenterType::ReturnType first(resSeg[0]);
@@ -78,8 +78,8 @@ struct CompoundMultiplier<false, DoTranspose> {  // colwise compound transposed 
   template <typename MatrixT1, typename MatrixT2, typename RhsT, typename ResT, typename Op>
   static void colMultiplyPostcompose(const CompoundBlockMatrix<DoTranspose, MatrixT1, MatrixT2>& mat,
                                      typename MatrixT1::Index col, const RhsT& rhs, ResT& res, const Op& op) {
-    typedef Segmenter<internal::DYNAMIC, ResT, typename CompoundBlockMatrix<DoTranspose, MatrixT1, MatrixT2>::Index>
-        SegmenterType;
+    using SegmenterType =
+        Segmenter<internal::DYNAMIC, ResT, typename CompoundBlockMatrix<DoTranspose, MatrixT1, MatrixT2>::Index>;
     SegmenterType resSeg(res, mat.compoundOffsets());
 
     typename SegmenterType::ReturnType first(resSeg[0]);

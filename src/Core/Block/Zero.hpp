@@ -20,10 +20,10 @@ namespace bogus {
 template <typename Scalar>
 class Zero : public IterableBlockObject<Zero<Scalar> > {
  public:
-  typedef IterableBlockObject<Zero<Scalar> > Base;
+  using Base = IterableBlockObject<Zero<Scalar> >;
 
-  typedef typename Base::Index Index;
-  typedef typename Base::ConstTransposeReturnType ConstTransposeReturnType;
+  using Index = typename Base::Index;
+  using ConstTransposeReturnType = typename Base::ConstTransposeReturnType;
 
   explicit Zero(Index rows = 0, Index cols = 0) : m_rows(rows), m_cols(cols) {
     m_rowOffsets[0] = 0;
@@ -72,15 +72,15 @@ class Zero : public IterableBlockObject<Zero<Scalar> > {
 
 template <typename Scalar_>
 struct BlockMatrixTraits<Zero<Scalar_> > : public BlockMatrixTraits<BlockObjectBase<Zero<Scalar_> > > {
-  typedef Scalar_ Scalar;
+  using Scalar = Scalar_;
 
   enum {
     is_symmetric = 1,
   };
 
-  typedef Zero<Scalar> PlainObjectType;
-  typedef const PlainObjectType &ConstTransposeReturnType;
-  typedef PlainObjectType TransposeObjectType;
+  using PlainObjectType = Zero<Scalar>;
+  using ConstTransposeReturnType = const PlainObjectType &;
+  using TransposeObjectType = PlainObjectType;
 };
 
 }  // namespace bogus

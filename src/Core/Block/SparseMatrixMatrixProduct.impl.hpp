@@ -37,7 +37,7 @@ namespace mm_impl {
 // A block-block product
 template <typename Index_, typename BlockPtr>
 struct SparseBlockProductTerm {
-  typedef Index_ Index;
+  using Index = Index_;
   Index index;  // Inner index in product matrix
 
   BlockPtr lhsPtr;
@@ -55,12 +55,12 @@ struct SparseBlockProductTerm {
 // Block structure computation using row-major startegy (deprecated)
 template <bool ColWise, typename Index, typename BlockPtr, bool is_symmetric, bool is_col_major>
 struct SparseBlockProductIndex {
-  typedef SparseBlockProductTerm<Index, BlockPtr> Term;
+  using Term = SparseBlockProductTerm<Index, BlockPtr>;
 
-  typedef std::vector<Term> InnerType;
+  using InnerType = std::vector<Term>;
   std::vector<InnerType> to_compute;
 
-  typedef SparseBlockIndex<true, Index, BlockPtr> CompressedIndexType;
+  using CompressedIndexType = SparseBlockIndex<true, Index, BlockPtr>;
   CompressedIndexType compressed;
 
   template <typename LhsIndex, typename RhsIndex>
@@ -125,12 +125,12 @@ struct SparseBlockProductIndex {
 // (Using less conditionals, as it does not have to compare inner indices in the tighter loop)
 template <typename Index, typename BlockPtr, bool is_symmetric, bool is_col_major>
 struct SparseBlockProductIndex<true, Index, BlockPtr, is_symmetric, is_col_major> {
-  typedef SparseBlockProductTerm<Index, BlockPtr> Term;
+  using Term = SparseBlockProductTerm<Index, BlockPtr>;
 
-  typedef std::vector<Term> InnerType;
+  using InnerType = std::vector<Term>;
   std::vector<InnerType> to_compute;
 
-  typedef SparseBlockIndex<true, Index, BlockPtr> CompressedIndexType;
+  using CompressedIndexType = SparseBlockIndex<true, Index, BlockPtr>;
   CompressedIndexType compressed;
 
   template <typename LhsIndex, typename RhsIndex>
@@ -296,9 +296,9 @@ template <typename TransposeOption, typename ResBlockRef, typename ProductIndex,
           typename ResBlocks, typename Scalar>
 static void compute_blocks(const ProductIndex &productIndex, const std::size_t nBlocks, const LhsBlocks &lhsBlocks,
                            const RhsBlocks &rhsBlocks, ResBlocks &resBlocks, Scalar scaling) {
-  typedef typename ProductIndex::Term Term;
-  typedef typename Term::Index Index;
-  typedef std::pair<const Term *, unsigned> BlockComputation;
+  using Term = typename ProductIndex::Term;
+  using Index = typename Term::Index;
+  using BlockComputation = std::pair<const Term *, unsigned>;
 
   std::vector<BlockComputation> flat_compute(nBlocks);
 
@@ -353,12 +353,12 @@ static void compute_blocks(const ProductIndex &productIndex, const std::size_t n
 template <typename Derived>
 template <bool ColWise, typename LhsT, typename RhsT>
 void SparseBlockMatrixBase<Derived>::setFromProduct(const Product<LhsT, RhsT> &prod) {
-  typedef Product<LhsT, RhsT> Prod;
+  using Prod = Product<LhsT, RhsT>;
 
   Evaluator<typename Prod::Lhs::ObjectType> lhs(prod.lhs.object);
   Evaluator<typename Prod::Rhs::ObjectType> rhs(prod.rhs.object);
-  typedef BlockMatrixTraits<typename Prod::PlainLhsMatrixType> LhsTraits;
-  typedef BlockMatrixTraits<typename Prod::PlainRhsMatrixType> RhsTraits;
+  using LhsTraits = BlockMatrixTraits<typename Prod::PlainLhsMatrixType>;
+  using RhsTraits = BlockMatrixTraits<typename Prod::PlainRhsMatrixType>;
 
   static_assert(!Prod::transposeLhs || IsTransposable<typename LhsTraits::BlockType>::Value,
                 "TRANSPOSE_IS_NOT_DEFINED_FOR_THIS_BLOCK_TYPE");
@@ -385,8 +385,8 @@ void SparseBlockMatrixBase<Derived>::setFromProduct(const Product<LhsT, RhsT> &p
   colMajorIndex().resizeOuter(rowMajorIndex().innerSize());
 
   {
-    typedef mm_impl::SparseBlockProductIndex<ColWise, Index, BlockPtr, Traits::is_symmetric, Traits::is_col_major>
-        ProductIndex;
+    using ProductIndex =
+        mm_impl::SparseBlockProductIndex<ColWise, Index, BlockPtr, Traits::is_symmetric, Traits::is_col_major>;
     ProductIndex productIndex;
 
     {
@@ -400,11 +400,10 @@ void SparseBlockMatrixBase<Derived>::setFromProduct(const Product<LhsT, RhsT> &p
     const unsigned outerSize = majorIndex().outerSize();
     createBlockShapes(productIndex.compressed.outer[outerSize], productIndex.compressed, m_blocks);
 
-    typedef mm_impl::BinaryTransposeOption<
+    using TransposeOption = mm_impl::BinaryTransposeOption<
         LhsTraits::is_symmetric && !(BlockTraits<typename LhsTraits::BlockType>::is_self_transpose),
         RhsTraits::is_symmetric && !(BlockTraits<typename RhsTraits::BlockType>::is_self_transpose), Prod::transposeLhs,
-        Prod::transposeRhs>
-        TransposeOption;
+        Prod::transposeRhs>;
 
     mm_impl::template compute_blocks<TransposeOption, BlockRef>(productIndex, nBlocks(), lhs->blocks(), rhs->blocks(),
                                                                 m_blocks, prod.lhs.scaling * prod.rhs.scaling);

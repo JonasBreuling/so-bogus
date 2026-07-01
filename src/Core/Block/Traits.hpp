@@ -21,15 +21,15 @@ struct BlockMatrixTraits {};
 //! Default container type, that should resizable and use contiguous storage
 template <typename ElementType>
 struct ResizableSequenceContainer {
-  typedef std::vector<ElementType> Type;
+  using Type = std::vector<ElementType>;
   enum { is_mutable = 1 };
 };
 
 template <typename BlockType>
 struct BlockTraits {
-  typedef typename BlockType::Scalar Scalar;
+  using Scalar = typename BlockType::Scalar;
   //! Type for storing the result of transpose_block( BlockType ), useful for cacheTranspose()
-  typedef BlockType TransposeStorageType;
+  using TransposeStorageType = BlockType;
 
   enum {
     //! Number of rows spanned by a block at compile time ; useful for efficient segmentation
@@ -61,7 +61,7 @@ struct BlockVectorProductTraits {};
 //! Defines the return type of the product of two blocks potentially transposed
 template <typename LhsBlockType, typename RhsBlockType, bool TransposeLhs, bool TransposeRhs>
 struct BlockBlockProductTraits {
-  typedef LhsBlockType ReturnType;
+  using ReturnType = LhsBlockType;
 };
 
 }  // namespace bogus

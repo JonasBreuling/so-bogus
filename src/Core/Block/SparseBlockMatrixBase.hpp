@@ -36,31 +36,31 @@ struct SparseBlockIndexGetter;
 template <typename Derived>
 class SparseBlockMatrixBase : public BlockMatrixBase<Derived> {
  public:
-  // Convenient typedefs	and using directives
+  // Convenient using declarations and using directives
 
-  typedef BlockMatrixBase<Derived> Base;
-  typedef BlockMatrixTraits<Derived> Traits;
+  using Base = BlockMatrixBase<Derived>;
+  using Traits = BlockMatrixTraits<Derived>;
 
-  typedef typename Traits::BlockPtr BlockPtr;
-  typedef typename Base::Index Index;
+  using BlockPtr = typename Traits::BlockPtr;
+  using Index = typename Base::Index;
 
-  typedef typename Traits::MajorIndexType MajorIndexType;
+  using MajorIndexType = typename Traits::MajorIndexType;
 
-  typedef typename Base::BlockType BlockType;
-  typedef typename Base::BlockRef BlockRef;
-  typedef typename Base::ConstBlockRef ConstBlockRef;
-  typedef typename Base::Scalar Scalar;
+  using BlockType = typename Base::BlockType;
+  using BlockRef = typename Base::BlockRef;
+  using ConstBlockRef = typename Base::ConstBlockRef;
+  using Scalar = typename Base::Scalar;
 
-  typedef typename MajorIndexType::InnerIterator InnerIterator;
+  using InnerIterator = typename MajorIndexType::InnerIterator;
 
-  typedef SparseBlockIndex<false, Index, BlockPtr> UncompressedIndexType;
-  typedef SparseBlockIndex<true, Index, BlockPtr> CompressedIndexType;
+  using UncompressedIndexType = SparseBlockIndex<false, Index, BlockPtr>;
+  using CompressedIndexType = SparseBlockIndex<true, Index, BlockPtr>;
 
   // Minor index is always uncompressed, as the blocks cannot be contiguous
   // For a symmetric matrix, it does not store diagonal block in the minor and transpose index
-  typedef UncompressedIndexType MinorIndexType;
+  using MinorIndexType = UncompressedIndexType;
   // Transpose index is compressed for perf, as we always create it in a compressed-compatible way
-  typedef CompressedIndexType TransposeIndexType;
+  using TransposeIndexType = CompressedIndexType;
 
   using RowIndexType = std::conditional_t<Traits::is_col_major, MinorIndexType, MajorIndexType>;
   using ColIndexType = std::conditional_t<Traits::is_col_major, MajorIndexType, MinorIndexType>;
@@ -68,31 +68,29 @@ class SparseBlockMatrixBase : public BlockMatrixBase<Derived> {
   // Canonical type for a mutable matrix with different block type
   template <typename OtherBlockType, bool PreserveSymmetry = true, bool SwitchDirection = false>
   struct MutableImpl {
-    typedef SparseBlockMatrix<OtherBlockType, Traits::flags & ~flags::UNCOMPRESSED> Type;
+    using Type = SparseBlockMatrix<OtherBlockType, Traits::flags & ~flags::UNCOMPRESSED>;
   };
   template <typename OtherBlockType>
   struct MutableImpl<OtherBlockType, false, false> {
-    typedef SparseBlockMatrix<OtherBlockType, Traits::flags & ~flags::UNCOMPRESSED & ~flags::SYMMETRIC> Type;
+    using Type = SparseBlockMatrix<OtherBlockType, Traits::flags & ~flags::UNCOMPRESSED & ~flags::SYMMETRIC>;
   };
   template <typename OtherBlockType>
   struct MutableImpl<OtherBlockType, true, true> {
-    typedef SparseBlockMatrix<OtherBlockType, (Traits::flags & ~flags::UNCOMPRESSED & ~flags::COL_MAJOR) |
-                                                  ((~Traits::flags) & flags::COL_MAJOR)>
-        Type;
+    using Type = SparseBlockMatrix<OtherBlockType, (Traits::flags & ~flags::UNCOMPRESSED & ~flags::COL_MAJOR) |
+                                                       ((~Traits::flags) & flags::COL_MAJOR)>;
   };
   template <typename OtherBlockType>
   struct MutableImpl<OtherBlockType, false, true> {
-    typedef SparseBlockMatrix<OtherBlockType,
-                              (Traits::flags & ~flags::UNCOMPRESSED & ~flags::SYMMETRIC & ~flags::COL_MAJOR) |
-                                  ((~Traits::flags) & flags::COL_MAJOR)>
-        Type;
+    using Type = SparseBlockMatrix<OtherBlockType,
+                                   (Traits::flags & ~flags::UNCOMPRESSED & ~flags::SYMMETRIC & ~flags::COL_MAJOR) |
+                                       ((~Traits::flags) & flags::COL_MAJOR)>;
   };
-  typedef typename MutableImpl<BlockType, true>::Type CopyResultType;
+  using CopyResultType = typename MutableImpl<BlockType, true>::Type;
 
-  typedef typename Base::ConstTransposeReturnType ConstTransposeReturnType;
+  using ConstTransposeReturnType = typename Base::ConstTransposeReturnType;
 
-  typedef typename BlockTraits<BlockType>::TransposeStorageType TransposeBlockType;
-  typedef typename Traits::template ResizableBlockContainer<TransposeBlockType>::Type TransposeArrayType;
+  using TransposeBlockType = typename BlockTraits<BlockType>::TransposeStorageType;
+  using TransposeArrayType = typename Traits::template ResizableBlockContainer<TransposeBlockType>::Type;
 
   using Base::block;
   using Base::blocks;
@@ -454,7 +452,7 @@ class SparseBlockMatrixBase : public BlockMatrixBase<Derived> {
   using Base::m_cols;
   using Base::m_rows;
 
-  typedef SparseBlockMatrixFinalizer<Traits::is_symmetric> Finalizer;
+  using Finalizer = SparseBlockMatrixFinalizer<Traits::is_symmetric>;
   friend struct SparseBlockIndexGetter<Derived, true>;
   friend struct SparseBlockIndexGetter<Derived, false>;
 

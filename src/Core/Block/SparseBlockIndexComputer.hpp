@@ -19,8 +19,8 @@ namespace bogus {
 
 template <typename Derived, bool Major>
 struct SparseBlockIndexGetter {
-  typedef SparseBlockMatrixBase<Derived> MatrixType;
-  typedef typename MatrixType::UncompressedIndexType ReturnType;
+  using MatrixType = SparseBlockMatrixBase<Derived>;
+  using ReturnType = typename MatrixType::UncompressedIndexType;
 
   static ReturnType& get(MatrixType& matrix) { return matrix.m_minorIndex; }
 
@@ -34,8 +34,8 @@ struct SparseBlockIndexGetter {
 
 template <typename Derived>
 struct SparseBlockIndexGetter<Derived, true> {
-  typedef SparseBlockMatrixBase<Derived> MatrixType;
-  typedef typename MatrixType::MajorIndexType ReturnType;
+  using MatrixType = SparseBlockMatrixBase<Derived>;
+  using ReturnType = typename MatrixType::MajorIndexType;
 
   static ReturnType& get(MatrixType& matrix) { return matrix.m_majorIndex; }
   static const ReturnType& get(const MatrixType& matrix) { return matrix.majorIndex(); }
@@ -50,10 +50,10 @@ struct SparseBlockIndexGetter<Derived, true> {
 template <typename MatrixType, bool ColWise, bool Transpose,
           bool Symmetric = BlockMatrixTraits<MatrixType>::is_symmetric>
 struct SparseBlockIndexComputer {
-  typedef BlockMatrixTraits<MatrixType> Traits;
+  using Traits = BlockMatrixTraits<MatrixType>;
   enum { is_major = (ColWise != Transpose) == bool(Traits::is_col_major) };
-  typedef SparseBlockIndexGetter<MatrixType, is_major> Getter;
-  typedef typename Getter::ReturnType ReturnType;
+  using Getter = SparseBlockIndexGetter<MatrixType, is_major>;
+  using ReturnType = typename Getter::ReturnType;
 
   SparseBlockIndexComputer(const SparseBlockMatrixBase<MatrixType>& matrix) : m_matrix(matrix.derived()) {}
 
@@ -66,11 +66,10 @@ struct SparseBlockIndexComputer {
 
 template <typename MatrixType, bool ColWise, bool Transpose>
 struct SparseBlockIndexComputer<MatrixType, ColWise, Transpose, true> {
-  typedef BlockMatrixTraits<MatrixType> Traits;
+  using Traits = BlockMatrixTraits<MatrixType>;
   enum { is_major = (ColWise == bool(Traits::is_col_major)) };
-  typedef CompoundSparseBlockIndex<typename MatrixType::MajorIndexType, typename MatrixType::MinorIndexType,
-                                   bool(is_major)>
-      ReturnType;
+  using ReturnType = CompoundSparseBlockIndex<typename MatrixType::MajorIndexType, typename MatrixType::MinorIndexType,
+                                              bool(is_major)>;
 
   SparseBlockIndexComputer(const SparseBlockMatrixBase<MatrixType>& matrix)
       : m_index(matrix.majorIndex(), matrix.minorIndex()) {

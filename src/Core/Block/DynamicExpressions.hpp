@@ -21,14 +21,13 @@ namespace bogus {
 //! Sum of n similar expressions
 template <typename Expression>
 struct NarySum : public BlockObjectBase<NarySum<Expression> > {
-  typedef BlockObjectBase<NarySum<Expression> > Base;
-  typedef BlockMatrixTraits<NarySum<Expression> > Traits;
+  using Base = BlockObjectBase<NarySum<Expression> >;
+  using Traits = BlockMatrixTraits<NarySum<Expression> >;
 
-  typedef typename Traits::Index Index;
-  typedef typename Base::Scalar Scalar;
+  using Index = typename Traits::Index;
+  using Scalar = typename Base::Scalar;
 
-  // Using list as we dont assume existence of c++11 vector::emplace_back
-  typedef std::list<Scaling<Expression> > Sum;
+  using Sum = std::list<Scaling<Expression> >;
   Sum members;
 
   NarySum(const Index rows, const Index cols) : m_rows(rows), m_cols(cols) {}
@@ -57,16 +56,16 @@ struct NarySum : public BlockObjectBase<NarySum<Expression> > {
 
   NarySum &operator-=(const NarySum<Expression> &other) {
     assert(other.rows() == m_rows && other.cols() == m_cols);
-    for (typename Sum::const_iterator it = other.members.begin(); it != other.members.end(); ++it) {
-      (*this) -= *it;
+    for (const auto &member : other.members) {
+      (*this) -= member;
     }
     return *this;
   }
 
   typename Base::ConstTransposeReturnType transpose() const {
     typename Base::ConstTransposeReturnType transposed_sum(m_cols, m_rows);
-    for (typename Sum::const_iterator it = members.begin(); it != members.end(); ++it) {
-      transposed_sum += it->transpose();
+    for (const auto &member : members) {
+      transposed_sum += member.transpose();
     }
 
     return transposed_sum;
@@ -115,9 +114,9 @@ template <typename Expression>
 struct BlockMatrixTraits<NarySum<Expression> > : public BlockMatrixTraits<Addition<Expression, Expression> > {
   enum { is_temporary = 0 };
 
-  typedef typename Expression::PlainObjectType PlainObjectType;
-  typedef NarySum<typename Expression::TransposeObjectType> ConstTransposeReturnType;
-  typedef ConstTransposeReturnType TransposeObjectType;
+  using PlainObjectType = typename Expression::PlainObjectType;
+  using ConstTransposeReturnType = NarySum<typename Expression::TransposeObjectType>;
+  using TransposeObjectType = ConstTransposeReturnType;
 };
 
 }  // namespace bogus

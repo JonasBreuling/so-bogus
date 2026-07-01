@@ -20,13 +20,13 @@ namespace internal {
 //! Storage for blocks shapes and coefficient data of FlatSparseBlockMatrix
 template <typename BlockT, typename Index, typename BlockPtr>
 struct FlatBlockStorage {
-  typedef BlockTraits<BlockT> Traits;
-  typedef typename Traits::Scalar Scalar;
+  using Traits = BlockTraits<BlockT>;
+  using Scalar = typename Traits::Scalar;
 
-  typedef typename BlockT::MapType BlockRef;
-  typedef typename BlockT::ConstMapType ConstBlockRef;
+  using BlockRef = typename BlockT::MapType;
+  using ConstBlockRef = typename BlockT::ConstMapType;
 
-  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> Buffer;
+  using Buffer = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
 
   //! Shape and offset in data buffer for a given block
   struct Block {
@@ -148,7 +148,7 @@ struct FlatBlockStorage {
 
   const Buffer& buffer() const { return m_buffer; }
 
-  typedef typename ResizableSequenceContainer<Block>::Type BlocksArrayType;
+  using BlocksArrayType = typename ResizableSequenceContainer<Block>::Type;
   const BlocksArrayType& shapes() const { return m_shapes; }
 
 #ifdef BOGUS_WITH_BOOST_SERIALIZATION
@@ -173,9 +173,9 @@ struct FlatBlockStorage {
 template <typename BlockT, int Flags>
 struct BlockMatrixTraits<FlatSparseBlockMatrix<BlockT, Flags> >
     : public BlockMatrixTraits<BlockObjectBase<FlatSparseBlockMatrix<BlockT, Flags> > > {
-  typedef BlockMatrixTraits<BlockObjectBase<FlatSparseBlockMatrix<BlockT, Flags> > > BaseTraits;
-  typedef typename BaseTraits::Index Index;
-  typedef typename BlockTraits<BlockT>::Scalar Scalar;
+  using BaseTraits = BlockMatrixTraits<BlockObjectBase<FlatSparseBlockMatrix<BlockT, Flags> > >;
+  using Index = typename BaseTraits::Index;
+  using Scalar = typename BlockTraits<BlockT>::Scalar;
 
   enum {
     is_symmetric = !!(Flags & flags::SYMMETRIC),
@@ -183,22 +183,22 @@ struct BlockMatrixTraits<FlatSparseBlockMatrix<BlockT, Flags> >
     ColsPerBlock = BlockTraits<BlockT>::ColsAtCompileTime
   };
 
-  typedef BOGUS_DEFAULT_BLOCK_PTR_TYPE BlockPtr;
-  typedef BlockT BlockType;
+  using BlockPtr = BOGUS_DEFAULT_BLOCK_PTR_TYPE;
+  using BlockType = BlockT;
 
   template <typename OtherBlockType>
   struct ResizableBlockContainer {
-    typedef internal::FlatBlockStorage<OtherBlockType, Index, BlockPtr> Type;
+    using Type = internal::FlatBlockStorage<OtherBlockType, Index, BlockPtr>;
   };
 
-  typedef typename ResizableBlockContainer<BlockType>::Type BlocksArrayType;
+  using BlocksArrayType = typename ResizableBlockContainer<BlockType>::Type;
 
-  typedef typename BlocksArrayType::BlockRef BlockRef;
-  typedef typename BlocksArrayType::ConstBlockRef ConstBlockRef;
+  using BlockRef = typename BlocksArrayType::BlockRef;
+  using ConstBlockRef = typename BlocksArrayType::ConstBlockRef;
 
   enum { is_compressed = !!(~Flags & flags::UNCOMPRESSED), is_col_major = !!(Flags & flags::COL_MAJOR), flags = Flags };
 
-  typedef SparseBlockIndex<is_compressed, Index, BlockPtr> MajorIndexType;
+  using MajorIndexType = SparseBlockIndex<is_compressed, Index, BlockPtr>;
 };
 
 //! Sparse Block Matrix
@@ -210,8 +210,8 @@ struct BlockMatrixTraits<FlatSparseBlockMatrix<BlockT, Flags> >
 template <typename BlockT, int Flags>
 class FlatSparseBlockMatrix : public SparseBlockMatrixBase<FlatSparseBlockMatrix<BlockT, Flags> > {
  public:
-  typedef SparseBlockMatrixBase<FlatSparseBlockMatrix> Base;
-  typedef typename Base::Scalar Scalar;
+  using Base = SparseBlockMatrixBase<FlatSparseBlockMatrix>;
+  using Scalar = typename Base::Scalar;
 
   FlatSparseBlockMatrix() : Base() {}
 
@@ -236,10 +236,10 @@ class FlatSparseBlockMatrix : public SparseBlockMatrixBase<FlatSparseBlockMatrix
 
   using Base::m_blocks;
   using Base::m_transposeBlocks;
-  typedef typename Base::Traits Traits;
-  typedef typename Base::Index Index;
-  typedef typename Base::MajorIndexType MajorIndexType;
-  typedef typename Base::BlockPtr BlockPtr;
+  using Traits = typename Base::Traits;
+  using Index = typename Base::Index;
+  using MajorIndexType = typename Base::MajorIndexType;
+  using BlockPtr = typename Base::BlockPtr;
 
   template <bool EnforceThreadSafety>
   typename Base::BlockRef allocateBlock(typename Base::BlockPtr& ptr, Index outerSize, Index innerSize) {
@@ -296,10 +296,10 @@ class FlatSparseBlockMatrix : public SparseBlockMatrixBase<FlatSparseBlockMatrix
 // Specialization for block matrix of MappedSparseBlockMatrix
 template <typename BlockT, int Flags>
 struct BlockTraits<FlatSparseBlockMatrix<BlockT, Flags> > {
-  typedef FlatSparseBlockMatrix<BlockT, Flags> BlockType;
+  using BlockType = FlatSparseBlockMatrix<BlockT, Flags>;
 
-  typedef typename BlockType::Scalar Scalar;
-  typedef FlatSparseBlockMatrix<typename BlockType::TransposeBlockType, Flags ^ flags::COL_MAJOR> TransposeStorageType;
+  using Scalar = typename BlockType::Scalar;
+  using TransposeStorageType = FlatSparseBlockMatrix<typename BlockType::TransposeBlockType, Flags ^ flags::COL_MAJOR>;
 
   enum {
     RowsAtCompileTime = internal::DYNAMIC,

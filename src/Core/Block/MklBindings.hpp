@@ -33,7 +33,7 @@ struct bindings {};
 
 template <>
 struct bindings<double> {
-  typedef double Scalar;
+  using Scalar = double;
   static void bsrmv(char *transa, MKL_INT *m, MKL_INT *k, MKL_INT *lb, Scalar *alpha, char *matdescra, Scalar *val,
                     MKL_INT *indx, MKL_INT *pntrb, MKL_INT *pntre, Scalar *x, Scalar *beta, Scalar *y) {
     mkl_dbsrmv(transa, m, k, lb, alpha, matdescra, val, indx, pntrb, pntre, x, beta, y);
@@ -95,12 +95,12 @@ static void rowmv(const SparseBlockIndex<true, MKL_INT, BlockPtr> &index, const 
 
 template <>
 struct SparseBlockMatrixOpProxy<true, true, double, MKL_INT> {
-  typedef double Scalar;
+  using Scalar = double;
 
   template <bool Transpose, typename Derived, typename RhsT, typename ResT>
   static void multiply(const SparseBlockMatrixBase<Derived> &matrix, const RhsT &rhs, ResT &res, Scalar alpha,
                        Scalar beta) {
-    typedef BlockMatrixTraits<Derived> Traits;
+    using Traits = BlockMatrixTraits<Derived>;
 
     mkl::bsrmv<Scalar>(Traits::is_symmetric, Transpose, Derived::RowsPerBlock, matrix.rowsOfBlocks(),
                        matrix.colsOfBlocks(), 0, matrix.majorIndex().rowIndex(), matrix.majorIndex().columns(),
@@ -110,7 +110,7 @@ struct SparseBlockMatrixOpProxy<true, true, double, MKL_INT> {
   template <typename Derived, typename RhsT, typename ResT>
   static void splitRowMultiply(const SparseBlockMatrixBase<Derived> &matrix, typename Derived::Index row,
                                const RhsT &rhs, ResT &res) {
-    typedef BlockMatrixTraits<Derived> Traits;
+    using Traits = BlockMatrixTraits<Derived>;
 
     if (Traits::is_symmetric && !matrix.transposeIndex().valid) {
       SparseBlockSplitRowMultiplier<Traits::is_symmetric, !Traits::is_col_major>::splitRowMultiply(matrix, row, rhs,

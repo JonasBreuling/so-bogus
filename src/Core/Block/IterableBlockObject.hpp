@@ -20,11 +20,11 @@ namespace bogus {
 template <typename Derived>
 class IterableBlockObject : public BlockObjectBase<Derived> {
  public:
-  typedef BlockMatrixTraits<Derived> Traits;
-  typedef typename Traits::Index Index;
-  typedef typename Traits::Scalar Scalar;
+  using Traits = BlockMatrixTraits<Derived>;
+  using Index = typename Traits::Index;
+  using Scalar = typename Traits::Scalar;
 
-  typedef BlockObjectBase<Derived> Base;
+  using Base = BlockObjectBase<Derived>;
   using Base::derived;
 
   //! Returns the total number of blocks of the matrix
@@ -65,7 +65,7 @@ class IterableBlockObject : public BlockObjectBase<Derived> {
   //! Should be overidden by mutable types
   template <typename OtherBlockType, bool PreserveSymmetry = true, bool SwitchDirection = false>
   struct MutableImpl {
-    typedef typename Derived::PlainObjectType Type;
+    using Type = typename Derived::PlainObjectType;
   };
 };
 

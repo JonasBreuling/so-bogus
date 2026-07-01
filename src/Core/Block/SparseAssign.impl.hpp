@@ -22,7 +22,7 @@ template <bool Transpose>
 struct BlockCopier {
   template <typename BlockT1, typename BlockT2, typename ScalarT>
   static void copy(const BlockT2& source, BlockT1& dest, int n, ScalarT scale) {
-    typedef TransposeIf<Transpose> Getter;
+    using Getter = TransposeIf<Transpose>;
     if (scale == 1) {
 #ifndef BOGUS_DONT_PARALLELIZE
 #pragma omp parallel for
@@ -60,7 +60,7 @@ Derived& SparseBlockMatrixBase<Derived>::assign(const SparseBlockMatrixBase<Othe
 
   if (static_cast<const void*>(this) == static_cast<const void*>(&source)) return derived();
 
-  typedef typename SparseBlockMatrixBase<OtherDerived>::Traits OtherTraits;
+  using OtherTraits = typename SparseBlockMatrixBase<OtherDerived>::Traits;
   const bool sameMajorness = Transpose ^ (((bool)Traits::is_col_major) == ((bool)OtherTraits::is_col_major));
   const bool sameSymmetry = ((bool)Traits::is_symmetric) == ((bool)OtherTraits::is_symmetric);
   bool useTransposeIndex = false;
@@ -119,14 +119,13 @@ Derived& SparseBlockMatrixBase<Derived>::assign(const SparseBlockMatrixBase<Othe
   } else {
     derived().resetFor(source.blocks());
 
-    typedef SparseBlockIndexComputer<OtherDerived, Traits::is_col_major, Transpose> IndexComputerType;
+    using IndexComputerType = SparseBlockIndexComputer<OtherDerived, Traits::is_col_major, Transpose>;
     IndexComputerType indexComputer(source);
-    typedef typename IndexComputerType::ReturnType SourceIndexType;
+    using SourceIndexType = typename IndexComputerType::ReturnType;
     const SourceIndexType& sourceIndex = indexComputer.get();
 
-    typedef BlockTransposeOption<
-        OtherTraits::is_symmetric && !(BlockTraits<typename OtherTraits::BlockType>::is_self_transpose), Transpose>
-        TransposeIf;
+    using TransposeIf = BlockTransposeOption<
+        OtherTraits::is_symmetric && !(BlockTraits<typename OtherTraits::BlockType>::is_self_transpose), Transpose>;
 
     assert(sourceIndex.valid);
 

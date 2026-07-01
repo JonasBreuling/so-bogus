@@ -17,9 +17,9 @@
 
 template <typename Derived>
 std::ostream &operator<<(std::ostream &out, const bogus::SparseBlockMatrixBase<Derived> &sbm) {
-  typedef bogus::SparseBlockIndexComputer<Derived, false, false> IndexComputerType;
+  using IndexComputerType = bogus::SparseBlockIndexComputer<Derived, false, false>;
   IndexComputerType indexComputer(sbm);
-  typedef typename IndexComputerType::ReturnType SourceIndexType;
+  using SourceIndexType = typename IndexComputerType::ReturnType;
   const SourceIndexType &sourceIndex = indexComputer.get();
 
   out << " Total rows: " << sbm.rows() << " / cols: " << sbm.cols() << std::endl;

@@ -19,18 +19,18 @@ namespace bogus {
 template <typename Derived>
 class BlockMatrixBase : public IterableBlockObject<Derived> {
  public:
-  typedef BlockMatrixTraits<Derived> Traits;
-  typedef typename Traits::Index Index;
-  typedef typename Traits::Scalar Scalar;
+  using Traits = BlockMatrixTraits<Derived>;
+  using Index = typename Traits::Index;
+  using Scalar = typename Traits::Scalar;
 
   // Supplemental Traits interface for BlockMatrixBase
-  typedef typename Traits::BlockType BlockType;
-  typedef typename Traits::BlockRef BlockRef;
-  typedef typename Traits::ConstBlockRef ConstBlockRef;
-  typedef typename Traits::BlockPtr BlockPtr;
-  typedef typename Traits::BlocksArrayType BlocksArrayType;
+  using BlockType = typename Traits::BlockType;
+  using BlockRef = typename Traits::BlockRef;
+  using ConstBlockRef = typename Traits::ConstBlockRef;
+  using BlockPtr = typename Traits::BlockPtr;
+  using BlocksArrayType = typename Traits::BlocksArrayType;
 
-  typedef IterableBlockObject<Derived> Base;
+  using Base = IterableBlockObject<Derived>;
   using Base::derived;
 
   //! Return value of blockPtr( Index, Index ) for non-existing block
@@ -38,7 +38,7 @@ class BlockMatrixBase : public IterableBlockObject<Derived> {
 
   BlockMatrixBase() : m_rows(0), m_cols(0) {}
 
-  virtual ~BlockMatrixBase() {}
+  virtual ~BlockMatrixBase() = default;
 
   //! Multiplies a given block-row of the matrix with \p rhs, omitting the diagonal block
   /*! I.e. res = [ M( row, 0 ) ... M( row, row-1 ) 0 M( row, row+1 ) ... M( row, colsOfBlocks()-1 ) ] * rhs

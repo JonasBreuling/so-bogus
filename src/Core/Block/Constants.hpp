@@ -73,7 +73,7 @@ namespace internal {
 enum { DYNAMIC = -1 };
 }  // namespace internal
 
-typedef BOGUS_DEFAULT_DENSE_INDEX_TYPE DenseIndexType;
+using DenseIndexType = BOGUS_DEFAULT_DENSE_INDEX_TYPE;
 
 }  // namespace bogus
 

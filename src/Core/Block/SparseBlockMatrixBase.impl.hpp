@@ -335,7 +335,7 @@ Derived& SparseBlockMatrixBase<Derived>::applyPermutation(const std::size_t* ind
   const MajorIndexType& sourceIndex = majorIndex();
 
   const bool MayTranspose = Traits::is_symmetric && !BlockTraits<BlockType>::is_self_transpose;
-  typedef TransposeIf<MayTranspose> TransposeOption;
+  using TransposeOption = TransposeIf<MayTranspose>;
 
   UncompressedIndexType destIndex;
   destIndex.resizeOuter(sourceIndex.outerSize());
@@ -439,8 +439,8 @@ Derived& SparseBlockMatrixBase<Derived>::setBlocksToZero() {
 template <typename Derived>
 template <bool ColWise, typename Func>
 void SparseBlockMatrixBase<Derived>::eachBlockOf(const Index outer, Func func) const {
-  typedef SparseBlockIndexComputer<Derived, ColWise, false> IndexComputer;
-  typedef typename IndexComputer::ReturnType IndexType;
+  using IndexComputer = SparseBlockIndexComputer<Derived, ColWise, false>;
+  using IndexType = typename IndexComputer::ReturnType;
 
   IndexComputer cptr(*this);
   const IndexType& index = cptr.get();

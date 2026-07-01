@@ -8,8 +8,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef BOGUS_BLOCK_SCALAR_BINDGINS
-#define BOGUS_BLOCK_SCALAR_BINDGINS
+#ifndef BOGUS_BLOCK_SCALAR_BINDINGS
+#define BOGUS_BLOCK_SCALAR_BINDINGS
 
 #include "Expressions.hpp"
 #include <cmath>
@@ -38,8 +38,8 @@ BOGUS_BLOCK_SCALAR_TYPES
 #define BOGUS_PROCESS_SCALAR(Scalar_)     \
   template <>                             \
   struct BlockTraits<Scalar_> {           \
-    typedef Scalar_ Scalar;               \
-    typedef Scalar_ TransposeStorageType; \
+    using Scalar = Scalar_;               \
+    using TransposeStorageType = Scalar_; \
     enum {                                \
       RowsAtCompileTime = 1,              \
       ColsAtCompileTime = 1,              \

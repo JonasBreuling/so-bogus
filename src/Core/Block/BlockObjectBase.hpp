@@ -23,15 +23,15 @@ struct BlockObjectBase {
   //! Returns a reference to the implementation
   Derived& derived() { return static_cast<Derived&>(*this); }
 
-  typedef BlockMatrixTraits<Derived> Traits;
+  using Traits = BlockMatrixTraits<Derived>;
 
-  typedef typename Traits::Index Index;
-  typedef typename Traits::Scalar Scalar;
-  typedef typename Traits::ConstTransposeReturnType ConstTransposeReturnType;
-  typedef typename Traits::TransposeObjectType TransposeObjectType;
+  using Index = typename Traits::Index;
+  using Scalar = typename Traits::Scalar;
+  using ConstTransposeReturnType = typename Traits::ConstTransposeReturnType;
+  using TransposeObjectType = typename Traits::TransposeObjectType;
   enum { is_transposed = Traits::is_transposed };
 
-  typedef typename Traits::PlainObjectType PlainObjectType;
+  using PlainObjectType = typename Traits::PlainObjectType;
 
   //! Returns the total number of rows of the matrix ( expanding blocks )
   Index rows() const { return derived().rows(); }
@@ -83,13 +83,13 @@ struct BlockObjectBase {
 template <typename Derived>
 struct BlockMatrixTraits<BlockObjectBase<Derived> > {
   //! Index type -- for accessing elements, defining offsets, etc
-  typedef BOGUS_DEFAULT_INDEX_TYPE Index;
+  using Index = BOGUS_DEFAULT_INDEX_TYPE;
 
   //! Type representing the transpose of this object
-  typedef Transpose<Derived> TransposeObjectType;
+  using TransposeObjectType = Transpose<Derived>;
   //! Type returned by the transpose() method
   /*! Generally a TransposeObjectType or a const reference to it */
-  typedef TransposeObjectType ConstTransposeReturnType;
+  using ConstTransposeReturnType = TransposeObjectType;
 
   enum {
     is_symmetric = 0,   //!< Whether the object is self-transpose
@@ -105,7 +105,7 @@ struct BlockMatrixTraits<BlockObjectBase<Derived> > {
   };
 
   //! Type in which the expression may be evaluated into
-  typedef Derived PlainObjectType;
+  using PlainObjectType = Derived;
 };
 
 }  // namespace bogus

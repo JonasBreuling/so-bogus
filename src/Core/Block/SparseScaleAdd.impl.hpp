@@ -38,9 +38,9 @@ Derived &SparseBlockMatrixBase<Derived>::add(const SparseBlockMatrixBase<OtherDe
   static_assert(!Transpose || IsTransposable<typename OtherDerived::BlockType>::Value,
                 "TRANSPOSE_IS_NOT_DEFINED_FOR_THIS_BLOCK_TYPE");
 
-  typedef typename SparseBlockMatrixBase<OtherDerived>::Traits OtherTraits;
-  typedef std::pair<BlockPtr, typename OtherTraits::BlockPtr> PtrPair;
-  typedef std::pair<Index, PtrPair> NonZero;
+  using OtherTraits = typename SparseBlockMatrixBase<OtherDerived>::Traits;
+  using PtrPair = std::pair<BlockPtr, typename OtherTraits::BlockPtr>;
+  using NonZero = std::pair<Index, PtrPair>;
 
   if (rhs.empty()) return derived();
 
@@ -49,8 +49,8 @@ Derived &SparseBlockMatrixBase<Derived>::add(const SparseBlockMatrixBase<OtherDe
   // I - Compute non-zeros
   {
     SparseBlockIndexComputer<OtherDerived, Traits::is_col_major, Transpose> indexComputer(rhs);
-    typedef
-        typename SparseBlockIndexComputer<OtherDerived, Traits::is_col_major, Transpose>::ReturnType SourceIndexType;
+    using SourceIndexType =
+        typename SparseBlockIndexComputer<OtherDerived, Traits::is_col_major, Transpose>::ReturnType;
     const SourceIndexType &rhsIndex = indexComputer.get();
 
     const MajorIndexType &lhsIndex = majorIndex();
@@ -116,9 +116,8 @@ Derived &SparseBlockMatrixBase<Derived>::add(const SparseBlockMatrixBase<OtherDe
   typename Traits::BlocksArrayType resBlocks;
   createBlockShapes(offsets.back(), resIndex, resBlocks);
 
-  typedef BlockTransposeOption<
-      OtherTraits::is_symmetric && !(BlockTraits<typename OtherTraits::BlockType>::is_self_transpose), Transpose>
-      RhsGetter;
+  using RhsGetter = BlockTransposeOption<
+      OtherTraits::is_symmetric && !(BlockTraits<typename OtherTraits::BlockType>::is_self_transpose), Transpose>;
 
   // II - Proper addition
 
@@ -157,7 +156,7 @@ Derived &SparseBlockMatrixBase<Derived>::add(const SparseBlockMatrixBase<OtherDe
 template <typename Derived>
 template <typename LhsT, typename RhsT>
 Derived &SparseBlockMatrixBase<Derived>::operator=(const Addition<LhsT, RhsT> &addition) {
-  typedef Addition<LhsT, RhsT> Add;
+  using Add = Addition<LhsT, RhsT>;
 
   // WARNING -- Not safe w.r.t aliasing
 
@@ -175,7 +174,7 @@ Derived &SparseBlockMatrixBase<Derived>::operator=(const NarySum<Expression> &su
     setZero();
   } else {
     // WARNING -- Not safe w.r.t aliasing
-    typedef typename NarySum<Expression>::Sum::const_iterator Iterator;
+    using Iterator = typename NarySum<Expression>::Sum::const_iterator;
     Iterator it = sum.members.begin();
 
     *this = *it;

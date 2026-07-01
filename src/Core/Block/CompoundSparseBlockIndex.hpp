@@ -20,12 +20,12 @@ namespace bogus {
 template <typename FirstIndexType, typename SecondIndexType, bool NativeOrder>
 struct CompoundSparseBlockIndex
     : public SparseBlockIndexBase<CompoundSparseBlockIndex<FirstIndexType, SecondIndexType, NativeOrder> > {
-  typedef typename FirstIndexType::Index Index;
-  typedef typename FirstIndexType::BlockPtr BlockPtr;
+  using Index = typename FirstIndexType::Index;
+  using BlockPtr = typename FirstIndexType::BlockPtr;
 
-  typedef SparseBlockIndexBase<CompoundSparseBlockIndex<FirstIndexType, SecondIndexType, NativeOrder> > Base;
-  typedef typename Base::InnerOffsetsType InnerOffsetsType;
-  typedef typename Base::InnerIterator InnerIterator;
+  using Base = SparseBlockIndexBase<CompoundSparseBlockIndex<FirstIndexType, SecondIndexType, NativeOrder> >;
+  using InnerOffsetsType = typename Base::InnerOffsetsType;
+  using InnerIterator = typename Base::InnerIterator;
   using Base::valid;
 
   CompoundSparseBlockIndex(const SparseBlockIndexBase<FirstIndexType>& index1,
@@ -52,10 +52,10 @@ struct CompoundSparseBlockIndex
 
 template <typename FirstIndexType, typename SecondIndexType, bool NativeOrder>
 struct SparseBlockIndexTraits<CompoundSparseBlockIndex<FirstIndexType, SecondIndexType, NativeOrder> > {
-  typedef typename FirstIndexType::Index Index;
-  typedef typename FirstIndexType::BlockPtr BlockPtr;
+  using Index = typename FirstIndexType::Index;
+  using BlockPtr = typename FirstIndexType::BlockPtr;
 
-  typedef CompoundSparseBlockIndex<FirstIndexType, SecondIndexType, NativeOrder> SparseBlockIndexType;
+  using SparseBlockIndexType = CompoundSparseBlockIndex<FirstIndexType, SecondIndexType, NativeOrder>;
 
   struct InnerIterator {
     InnerIterator(const SparseBlockIndexType& index, Index outer)

@@ -52,19 +52,19 @@ struct BlockTranspose {
 // Self-transpose
 template <typename BlockType, bool DCT, bool DTT>
 struct BlockTranspose<BlockType, true, DCT, DTT> {
-  typedef const BlockType& ReturnType;
+  using ReturnType = const BlockType&;
   enum { is_defined = 1 };
 };
 // ConstTransposeReturnType
 template <typename BlockType, bool DTT>
 struct BlockTranspose<BlockType, false, true, DTT> {
-  typedef typename BlockType::ConstTransposeReturnType ReturnType;
+  using ReturnType = typename BlockType::ConstTransposeReturnType;
   enum { is_defined = 1 };
 };
 // BlockTransposeTraits
 template <typename BlockType>
 struct BlockTranspose<BlockType, false, false, true> {
-  typedef typename BlockTransposeTraits<BlockType>::ReturnType ReturnType;
+  using ReturnType = typename BlockTransposeTraits<BlockType>::ReturnType;
   enum { is_defined = 1 };
 };
 
@@ -118,7 +118,7 @@ struct BlockTransposeOption<false, CompileTimeTranspose> {
 //! Access to the dimensions of a block
 template <typename BlockT, bool Transpose_ = false>
 struct BlockDims {
-  typedef BlockTraits<BlockT> Traits;
+  using Traits = BlockTraits<BlockT>;
   static constexpr int Rows = Transpose_ ? Traits::ColsAtCompileTime : Traits::RowsAtCompileTime;
   static constexpr int Cols = Transpose_ ? Traits::RowsAtCompileTime : Traits::ColsAtCompileTime;
 };
@@ -127,26 +127,26 @@ namespace internal {
 
 template <int dimension, typename VectorType>
 struct SegmenterTraits {
-  typedef typename VectorType::template NRowsBlockXpr<dimension>::Type ReturnType;
-  typedef typename VectorType::template ConstNRowsBlockXpr<dimension>::Type ConstReturnType;
+  using ReturnType = typename VectorType::template NRowsBlockXpr<dimension>::Type;
+  using ConstReturnType = typename VectorType::template ConstNRowsBlockXpr<dimension>::Type;
 };
 
 template <int dimension, typename VectorType>
 struct SegmenterTraits<dimension, const VectorType> {
-  typedef typename VectorType::template ConstNRowsBlockXpr<dimension>::Type ConstReturnType;
-  typedef ConstReturnType ReturnType;
+  using ConstReturnType = typename VectorType::template ConstNRowsBlockXpr<dimension>::Type;
+  using ReturnType = ConstReturnType;
 };
 
 template <typename VectorType>
 struct SegmenterTraits<DYNAMIC, VectorType> {
-  typedef typename VectorType::RowsBlockXpr ReturnType;
-  typedef typename VectorType::ConstRowsBlockXpr ConstReturnType;
+  using ReturnType = typename VectorType::RowsBlockXpr;
+  using ConstReturnType = typename VectorType::ConstRowsBlockXpr;
 };
 
 template <typename VectorType>
 struct SegmenterTraits<DYNAMIC, const VectorType> {
-  typedef typename VectorType::ConstRowsBlockXpr ConstReturnType;
-  typedef ConstReturnType ReturnType;
+  using ConstReturnType = typename VectorType::ConstRowsBlockXpr;
+  using ReturnType = ConstReturnType;
 };
 }  // namespace internal
 
@@ -155,9 +155,9 @@ template <int DimensionAtCompileTime, typename VectorType, typename Index>
 struct Segmenter {
   enum { dimension = DimensionAtCompileTime };
 
-  typedef internal::SegmenterTraits<dimension, VectorType> Traits;
-  typedef typename Traits::ReturnType ReturnType;
-  typedef typename Traits::ConstReturnType ConstReturnType;
+  using Traits = internal::SegmenterTraits<dimension, VectorType>;
+  using ReturnType = typename Traits::ReturnType;
+  using ConstReturnType = typename Traits::ConstReturnType;
 
   Segmenter(VectorType& vec, const Index*) : m_vec(vec) {}
 
@@ -173,9 +173,9 @@ struct Segmenter {
 
 template <typename VectorType, typename Index>
 struct Segmenter<internal::DYNAMIC, VectorType, Index> {
-  typedef internal::SegmenterTraits<internal::DYNAMIC, VectorType> Traits;
-  typedef typename Traits::ReturnType ReturnType;
-  typedef typename Traits::ConstReturnType ConstReturnType;
+  using Traits = internal::SegmenterTraits<internal::DYNAMIC, VectorType>;
+  using ReturnType = typename Traits::ReturnType;
+  using ConstReturnType = typename Traits::ConstReturnType;
 
   Segmenter(VectorType& vec, const Index* offsets) : m_vec(vec), m_offsets(offsets) {}
 

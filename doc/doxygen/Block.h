@@ -10,7 +10,8 @@ namespace bogus {
 \page block Block
 \tableofcontents
 
-\note This module is released under the terms of the <a href="http://mozilla.org/MPL/2.0/">Mozilla Public License version 2.0</a>
+\note This module is released under the terms of the <a href="http://mozilla.org/MPL/2.0/">Mozilla Public License
+version 2.0</a>
 
 \section block_introduction Introduction
 
@@ -37,12 +38,15 @@ To use this library,
 \endcode
 
 
-The main user-fronting class of this library is SparseBlockMatrix, even if most of its methods are actually implemented by its parent, SparseBlockMatrixBase. FlatSparseBlockMatrix provides a more efficient implemtation with a similar interface when the blocks are dynamically-sized matrices.
-Alternatively, the MappedSparseBlockMatrix class allows an externally constructed sparse block matrix to be used inside bogus expressions.
+The main user-fronting class of this library is SparseBlockMatrix, even if most of its methods are actually implemented
+by its parent, SparseBlockMatrixBase. FlatSparseBlockMatrix provides a more efficient implemtation with a similar
+interface when the blocks are dynamically-sized matrices. Alternatively, the MappedSparseBlockMatrix class allows an
+externally constructed sparse block matrix to be used inside bogus expressions.
 
-SparseBlockMatrix, FlatSparseBlockMatrix, and MappedSparseBlockMatrix are templated with a block type, and an optional set of \ref flags.
-The library has been written to mainly accept Eigen dense and sparse matrices as block types, though little effort is required to make it compatible with other types.
-Additionally, scalar types ( such as \c double, \c float or \c int ) are supported out of the box, as well as LU and LDLT factorizations of Eigen matrices.
+SparseBlockMatrix, FlatSparseBlockMatrix, and MappedSparseBlockMatrix are templated with a block type, and an optional
+set of \ref flags. The library has been written to mainly accept Eigen dense and sparse matrices as block types, though
+little effort is required to make it compatible with other types. Additionally, scalar types ( such as \c double, \c
+float or \c int ) are supported out of the box, as well as LU and LDLT factorizations of Eigen matrices.
 
 The possible values for the \ref flags are a combination of:
  - \ref flags::COL_MAJOR
@@ -55,8 +59,10 @@ The possible values for the \ref flags are a combination of:
 Three steps are necessary to create a block sparse matrix:
  - Define the block dimensions using SparseBlockMatrixBase::setRows() and SparseBlockMatrixBase::setCols()
  - Optionally pre-allocate the necessary memory using SparseBlockMatrixBase::reserve()
- - Insert the non-zeros block using SparseBlockMatrixBase::insertBack(), SparseBlockMatrixBase::insert() or one of their variations
- - <b> Call SparseBlockMatrixBase::finalize() </b>. Really. This would have been a legitimate use for the late HTML blink tag.
+ - Insert the non-zeros block using SparseBlockMatrixBase::insertBack(), SparseBlockMatrixBase::insert() or one of their
+variations
+ - <b> Call SparseBlockMatrixBase::finalize() </b>. Really. This would have been a legitimate use for the late HTML
+blink tag.
 
 Example: Creating a block-diagonal matrix
 \code
@@ -85,9 +91,8 @@ sbm.finalize() ; // Compulsory !
 \endcode
 
 Note that you don't have to specify the block contents before the call to SparseBlockMatrixBase::finalize().
-Furthermore, if you don't want the resize() method to be called at insert time, you can just use SparseBlockMatrixBase::insertBack().
-The following code would work just as well, despite the increased verbosity:
-\code
+Furthermore, if you don't want the resize() method to be called at insert time, you can just use
+SparseBlockMatrixBase::insertBack(). The following code would work just as well, despite the increased verbosity: \code
 bogus::SparseBlockMatrix< Eigen::MatrixXd > sbm ;
 
 // Insert the diagonal blocks
@@ -102,7 +107,8 @@ sbm.diagonal(1) = Eigen::MatrixXd::Ones( 2, 2 ) ;
 \endcode
 
 The SparseBlockMatrixBase::insertBack() insertion method requires the blocks to be inserted <b>in order</b>.
-That is, for a row-major block matrix, filling the rows in increasing order, and filling each row with stricly increasing column indices.
+That is, for a row-major block matrix, filling the rows in increasing order, and filling each row with stricly
+increasing column indices.
 
 Alternatively, <b> for matrices with an uncompressed index</b>, the SparseBlockMatrixBase::insert() method may be used.
 In this case, there are no restrictions on the order in which blocks are inserted.
@@ -111,16 +117,18 @@ However, this is at the cost of poorer performance. Please refere to those metho
 \section block_flat ``Flat'' SparseBlockMatrix
 Internally, the SparseBlockMatrix<BlockT> class uses a \c std::vector<BlockT>
 to store its data. This work great for fixed-size blocks, as the storage is then contiguous.
-However, dynamically-sized blocks will be individually allocated on the heap, which may 
+However, dynamically-sized blocks will be individually allocated on the heap, which may
 degrade the caching performance when performing operations such as matrix-vector multiplications.
 
-The class FlatSparseBlockMatrix<BlockT> remedies to this problem. Its public interface is similar to 
-that of SparseBlockMatrix, but internally it uses a contiguous storage even for dynamically sized matrices, which may improve performance in this case. 
-Note that using FlatSparseBlockMatrix to store fixed-size blocks is wasteful, as it involves
-superfluous arithmetic operations keeping track of the individual blocks dimensions.
-SparseBlockMatrix and FlatSparseBlockMatrix should be interchangeable in most cases 
-(e.g., the result of an addition of SparseBlockMatrix can be affected to a FlatSparseBlockMatrix, and vice versa). However, FlatSparseBlockMatrix is much more experimental at this point. 
-Moreover, while SparseBlockMatrix can accomodate arbitrary block types (such as other sparse matrices, or references to linear solvers), the blocks inside a FlatSparseBlockMatrix must be simple dense matrices, such as Eigen::MatrixXd.
+The class FlatSparseBlockMatrix<BlockT> remedies to this problem. Its public interface is similar to
+that of SparseBlockMatrix, but internally it uses a contiguous storage even for dynamically sized matrices, which may
+improve performance in this case. Note that using FlatSparseBlockMatrix to store fixed-size blocks is wasteful, as it
+involves superfluous arithmetic operations keeping track of the individual blocks dimensions. SparseBlockMatrix and
+FlatSparseBlockMatrix should be interchangeable in most cases (e.g., the result of an addition of SparseBlockMatrix can
+be affected to a FlatSparseBlockMatrix, and vice versa). However, FlatSparseBlockMatrix is much more experimental at
+this point. Moreover, while SparseBlockMatrix can accomodate arbitrary block types (such as other sparse matrices, or
+references to linear solvers), the blocks inside a FlatSparseBlockMatrix must be simple dense matrices, such as
+Eigen::MatrixXd.
 
 
 \section block_map Creating a MappedSparseBlockMatrix
@@ -128,7 +136,7 @@ Moreover, while SparseBlockMatrix can accomodate arbitrary block types (such as 
 MappedSparseBlockMatrix are const references to either
  - another SparseBlockMatrixBase object that uses a compressed index
  - an external matrix in a BSR-like format
-	( e.g. it can handle column-major matrices as well )
+        ( e.g. it can handle column-major matrices as well )
 
 For instance, mapping to a SparseBlockMatrix
 \code
@@ -142,13 +150,14 @@ map.mapTo( source ) ;
 
 map.cloneDimensions( source ) ;
 map.mapTo( source.nBlocks(),
-	source.data(),
-	source.majorIndex().outerIndexPtr(),
-	source.majorIndex().innerIndexPtr()
-	);
+        source.data(),
+        source.majorIndex().outerIndexPtr(),
+        source.majorIndex().innerIndexPtr()
+        );
 \endcode
 
-in the previous example, note that the call to SparseBlockMatrixBase::cloneDimensions() could be replaced by calls to SparseBlockMatrixBase::setRows() and SparseBlockMatrixBase::setCols().
+in the previous example, note that the call to SparseBlockMatrixBase::cloneDimensions() could be replaced by calls to
+SparseBlockMatrixBase::setRows() and SparseBlockMatrixBase::setCols().
 
 \section block_access Reading the contents of a SparseBlockMatrix
 
@@ -163,10 +172,10 @@ SBM sbm ;
 //...
 
 for( int row = 0 ; row < sbm.rowsOfBlocks() ; ++ row ) {
-	for( SBM::InnerIterator it ( sbm.innerIterator( row ) ) ; it ; ++it ) {
-		std::cout << "Block at (" << row << ", " << it.inner() << ") is \n "
-				  << sbm.block( it.ptr() ) << "\n" ;
-	}
+        for( SBM::InnerIterator it ( sbm.innerIterator( row ) ) ; it ; ++it ) {
+                std::cout << "Block at (" << row << ", " << it.inner() << ") is \n "
+                                  << sbm.block( it.ptr() ) << "\n" ;
+        }
 }
 
 \endcode
@@ -181,14 +190,17 @@ Currently, the following operations are supported:
  - \ref block_mv
  - \ref block_mm
 
- Most of those operations can be done using the standard C++ operators, in a lazy way -- the resulting matrix will only be computed when assigned to another BlockMatrix.
-Since it is immutbale, a MappedSparseBlockMatrix can only be used in the righ-hand-side of those operations, never as a left-hand-side.
+ Most of those operations can be done using the standard C++ operators, in a lazy way -- the resulting matrix will only
+be computed when assigned to another BlockMatrix. Since it is immutbale, a MappedSparseBlockMatrix can only be used in
+the righ-hand-side of those operations, never as a left-hand-side.
 
- \warning The operations should be able to be composed in an arbitrary way, but in pratice there are a few \ref block_limitations.
+ \warning The operations should be able to be composed in an arbitrary way, but in pratice there are a few \ref
+block_limitations.
 
 \subsection block_assign Assignment
 
-Any SparseBlockMatrix can be assigned to another one (or to a FlatSparseBlockMatrix), as long as their block types are compatible.
+Any SparseBlockMatrix can be assigned to another one (or to a FlatSparseBlockMatrix), as long as their block types are
+compatible.
 
 \code
 bogus::SparseBlockMatrix< Eigen::Matrix3d, bogus::UNCOMPRESSED  > sbm ;
@@ -203,7 +215,8 @@ bogus::SparseBlockMatrix< Eigen::MatrixXd, bogus::COL_MAJOR >
 
 \subsection block_scaling Coefficient-wise scaling
 
-The multiplication of each block of a SparseBlockMatrix with a scalar can be conveniently done using the SparseBlockMatrixBase::scale() method or the \c '*=' and \c '/=' operators.
+The multiplication of each block of a SparseBlockMatrix with a scalar can be conveniently done using the
+SparseBlockMatrixBase::scale() method or the \c '*=' and \c '/=' operators.
 
 
 \subsection block_transpose Transpose
@@ -215,9 +228,11 @@ or inside an arithmetic operation ( see below )
 \subsection block_add Block Matrix/Block Matrix addition
 
 Two block matrix can be added together using the standard \c '+' operator, provided they have the same block structure
-( that is, their rows and columns of blocks must have similar dimensions ). This operator does no do any work, but just returns an Addition expression which will be evaluated when it is assigned to another SparseBlockMatrix.
+( that is, their rows and columns of blocks must have similar dimensions ). This operator does no do any work, but just
+returns an Addition expression which will be evaluated when it is assigned to another SparseBlockMatrix.
 
-Alternatively, the SparseBlockMatrixBase::add method provides a ?axpy-like interface which allows on-the-fly scaling of the right-hand-side. \c '-', \c '+=' and \c '-=' are also defined.
+Alternatively, the SparseBlockMatrixBase::add method provides a ?axpy-like interface which allows on-the-fly scaling of
+the right-hand-side. \c '-', \c '+=' and \c '-=' are also defined.
 
 Examples
 \code
@@ -267,45 +282,42 @@ res.noalias() += sbm * rhs ;
 
 \subsection block_mm Block Matrix/Block Matrix multiplication
 
-Two SparseBlockMatrix can me multiplied provided the dimensions of their blocks are compatible, using the standard \c '*' operator.
-The return type of this operator is a \ref Product expression, which in itself does not perform any computation; the proper multiplication
-will only be done when it is assigned to another SparseBlockMatrix.
-\code
+Two SparseBlockMatrix can me multiplied provided the dimensions of their blocks are compatible, using the standard \c
+'*' operator. The return type of this operator is a \ref Product expression, which in itself does not perform any
+computation; the proper multiplication will only be done when it is assigned to another SparseBlockMatrix. \code
 bogus::SparseBlockMatrix< GradBlockT > H ;
 // [...] Fill H
 bogus::SparseBlockMatrix< Eigen::Matrix3d, bogus::SYMMETRIC > W = H * H.transpose() ;
 \endcode
 
 \subsection block_expressions Expressions
-bogus uses lazy evaluation, and as such does not evaluate operations between matrices immediately, but stores them inside expression templates.
-While these expressions are transparently resolved at assignment time, and therefore should not generally matter to the end-user, they may be useful for the definition of matrix-free iterative solvers (see e.g. \ref block_solvers_is).
+bogus uses lazy evaluation, and as such does not evaluate operations between matrices immediately, but stores them
+inside expression templates. While these expressions are transparently resolved at assignment time, and therefore should
+not generally matter to the end-user, they may be useful for the definition of matrix-free iterative solvers (see e.g.
+\ref block_solvers_is).
 
-bogus defines two unary operations, \ref Transpose and \ref Scaling, and two binary operations, \ref Product and \ref Addition. For instance,
-\code 
-Addition< Scaling<AType>, Product< BType, Transpose<CType> > > expr = 3*A + B*C.transpose() ;
-\endcode
+bogus defines two unary operations, \ref Transpose and \ref Scaling, and two binary operations, \ref Product and \ref
+Addition. For instance, \code Addition< Scaling<AType>, Product< BType, Transpose<CType> > > expr = 3*A +
+B*C.transpose() ; \endcode
 
 In certain situations, one may not know at compile time the number of
-operations that define an expression. For such scenarios, bogus defines the \ref NarySum expression. For instance, if we want to use to use the expression
-\f$ H H^T + \sum_i{ a_i J_i M_i J_i^T } \f$ as a system matrix, we can do
-\code
+operations that define an expression. For such scenarios, bogus defines the \ref NarySum expression. For instance, if we
+want to use to use the expression \f$ H H^T + \sum_i{ a_i J_i M_i J_i^T } \f$ as a system matrix, we can do \code
 // Common type for each of the sum's operands
 typedef bogus::Product< JType,
                   bogus::Product< MType, bogus::Transpose< JType > > >
                   JMJtProd ;
 
 // Construct n-ary sum expression
-// The (common) number of rows and columns of the operands has to be provided beforehand, in order to allow empty sum expressions
-bogus::NarySum< JMJtProd > sum( nRows, nCols ) ;
-for( unsigned i = 0 ; i < Jmatrices.size() ; ++i ) {
-    const JType &J = Jmatrices[i] ;
-    sum += a[i] * ( J * ( Mmatrices[i] * J.transpose() ) );
+// The (common) number of rows and columns of the operands has to be provided beforehand, in order to allow empty sum
+expressions bogus::NarySum< JMJtProd > sum( nRows, nCols ) ; for( unsigned i = 0 ; i < Jmatrices.size() ; ++i ) { const
+JType &J = Jmatrices[i] ; sum += a[i] * ( J * ( Mmatrices[i] * J.transpose() ) );
 }
-  
+
 // Construct global expression
 typedef bogus::Product< HType, bogus::Transpose< HType > > HHtProd ;
 typedef bogus::Addition< HHtProd, bogus::NarySum< JMJtProd > > Expr ;
-  
+
 const Expr W = H * H.transpose() + sum ;
 
 // Use the expression inside a linear solver
@@ -315,7 +327,8 @@ bogus::Krylov<Expr>(W).solve(b,x) ;
 
 \subsection block_limitations Limitations
 
-As a rule of thumb, these limitations can be circumvented by explicitely assigning the result of each operation to a temporary object.
+As a rule of thumb, these limitations can be circumvented by explicitely assigning the result of each operation to a
+temporary object.
 
 \subsubsection block_limit_aliasing Aliasing
 For performance reasons, operations on SparseBlockMatrix should not be assumed to be aliasing-safe.
@@ -326,14 +339,15 @@ This is especially true for matrix-vector multiplication using directly BlockMat
 \subsubsection block_limit_type_deduction Type deduction
 In some cases bogus will not be able to deduce the correct return type for an operation.
 This can happen for matrix-matrix products that have to be evaluated as a part of a larger arithmetic expressions,
-and which involve "unusual" block types. If such an error occurs, just assign the offending product to a temporary SparseBlockMatrix.
+and which involve "unusual" block types. If such an error occurs, just assign the offending product to a temporary
+SparseBlockMatrix.
 
 \subsubsection block_limit_performance Performance
 bogus will not necessarily choose the most optimized type for the evaluation of temporary expressions. For example,
 it might choose a row-major matrix when a column-major one would be more approriate, or fail to notice that
 \c H \c * \c H.transpose() should use symmetric storage.
 
-Explicit parenthesisation will also help performance. Otherwise, bogus may 
+Explicit parenthesisation will also help performance. Otherwise, bogus may
 perform matrix-matrix products in an inefficient order, or allocate
 unnecessary temporary matrices.
 
@@ -350,7 +364,4 @@ may have different block types.
 
 */
 
-
-
-} //namespace bogus
-
+}  // namespace bogus

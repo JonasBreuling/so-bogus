@@ -15,12 +15,13 @@ So-bogus is a set of loosely connected components, organized as follow:
 
 - \ref core, a MPL-licensed header-only library, which include
   - \ref block, A block-sparse matrix library
-  - \ref block_solvers, Solvers ( Projected Gauss-Seidel, Projected Gradient, Krylov linear solvers ) using those matrices
+  - \ref block_solvers, Solvers ( Projected Gauss-Seidel, Projected Gradient, Krylov linear solvers ) using those
+matrices
 - \ref extra, a GPL-licensed header-only library, which include
   - \ref soc Tools for solving Second Order Cone complementarity problems with \ref block_solvers.
-	Includes enumerative and optimization-based one-contact solvers for Coulomb friction.
+        Includes enumerative and optimization-based one-contact solvers for Coulomb friction.
 - \ref interfaces Convenient, compilable wrappers for the most popular uses of the header-only libraries,
-	such as solving Coulomb friction problems. GPL licensed.
+        such as solving Coulomb friction problems. GPL licensed.
 
 \section core Core ( a.k.a. bogus )
 
@@ -34,7 +35,8 @@ For each module of the \c Core library, several header files are available, foll
 - \c Module.hpp Public classes and operators definitions
 - \c Module.impl.hpp Full implementation
 
-For the \ref block module, the file Block.io.hpp includes additional definitions for IO and serialization-related functions.
+For the \ref block module, the file Block.io.hpp includes additional definitions for IO and serialization-related
+functions.
 
 \subsection core_configuration Configuration
 
@@ -69,9 +71,8 @@ Do not include Eigen/Sparse bindings.
 
 \c BOGUS_WITH_MKL
 
-Enable MKL bindings. Only supports matrix/vector multiplication for compressed SparseBlockMatrixBase with fixed-size blocks.
-See \ref mkl.
-<i> Not defined by default. </i>
+Enable MKL bindings. Only supports matrix/vector multiplication for compressed SparseBlockMatrixBase with fixed-size
+blocks. See \ref mkl. <i> Not defined by default. </i>
 
 \c BOGUS_WITH_BOOST_SERIALIZATION
 
@@ -88,26 +89,26 @@ At the time, the only module in \ref extra is \ref soc.
 
 \section interfaces Interfaces
 
-The \ref Interfaces part of So-bogus is not considered stable yet, but provide examples of how to use the \ref core and \ref extra libraries. For instance,
-PrimalFrictionProblem is a relatively generic representation of a 2D or 3D friction
+The \ref Interfaces part of So-bogus is not considered stable yet, but provide examples of how to use the \ref core and
+\ref extra libraries. For instance, PrimalFrictionProblem is a relatively generic representation of a 2D or 3D friction
 problem for which the mass matrix is a diagonal of dense blocks. It can be converted
-to a DualFrictionProblem, which in turn can be solved using a GaussSeidel or ProjectedGradient block solver, or the Cadoux algorithm \cite ACML11 .
+to a DualFrictionProblem, which in turn can be solved using a GaussSeidel or ProjectedGradient block solver, or the
+Cadoux algorithm \cite ACML11 .
 
 On the other hand, MecheFrictionProblem defines a more specific interface, but
 provides more features, such as serialization or diagonal regularization.
 Its public interface rely on as few custom classes as possible.
 
 \note
-So-bogus header-only parts are meant to be modular and composable; the \ref Interfaces library is not, and address a very specific use case.
-Consequently, you should probably not use the compiled library in your program, but create your own wrapper over the \ref core and \ref extra modules.
-For instance, for maximal coordinates models,
-PrimalFrictionProblem will not be optimal, as its mass matrix uses dense diagonal blocks. You will probably want to use a variation that use Eigen::SparseMatrix blocks for M and H.
+So-bogus header-only parts are meant to be modular and composable; the \ref Interfaces library is not, and address a
+very specific use case. Consequently, you should probably not use the compiled library in your program, but create your
+own wrapper over the \ref core and \ref extra modules. For instance, for maximal coordinates models,
+PrimalFrictionProblem will not be optimal, as its mass matrix uses dense diagonal blocks. You will probably want to use
+a variation that use Eigen::SparseMatrix blocks for M and H.
 
-Similarly, while bogus provides all the components required for solving Mixed Complementarity Problems, no such solver is exposed through the \ref Interfaces .
+Similarly, while bogus provides all the components required for solving Mixed Complementarity Problems, no such solver
+is exposed through the \ref Interfaces .
 
 */
 
-
-} //namespace bogus
-
-
+}  // namespace bogus

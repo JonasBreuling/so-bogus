@@ -18,7 +18,6 @@
  * along with So-bogus.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #ifndef BOGUS_SECOND_ORDER_IMPL_HPP
 #define BOGUS_SECOND_ORDER_IMPL_HPP
 

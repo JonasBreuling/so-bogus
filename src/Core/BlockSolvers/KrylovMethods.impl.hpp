@@ -54,7 +54,7 @@ void apply(const Preconditioner *P, const RhsT &b, ResT &x) {
 template <typename Mat, typename Prec, typename Traits>
 template <typename RhsT, typename ResT>
 typename CG<Mat, Prec, Traits>::Scalar CG<Mat, Prec, Traits>::vectorSolve(const RhsT &b, ResT x) const {
-  typedef typename Traits::template MutableClone<RhsT>::Type Vector;
+  using Vector = typename Traits::template MutableClone<RhsT>::Type;
   Vector r;
 
   Scalar scale;
@@ -95,7 +95,7 @@ typename CG<Mat, Prec, Traits>::Scalar CG<Mat, Prec, Traits>::vectorSolve(const 
 template <typename Mat, typename Prec, typename Traits>
 template <typename RhsT, typename ResT>
 typename BiCG<Mat, Prec, Traits>::Scalar BiCG<Mat, Prec, Traits>::vectorSolve(const RhsT &b, ResT x) const {
-  typedef typename Traits::template MutableClone<RhsT>::Type Vector;
+  using Vector = typename Traits::template MutableClone<RhsT>::Type;
   Vector r;
 
   Scalar scale;
@@ -150,7 +150,7 @@ typename BiCG<Mat, Prec, Traits>::Scalar BiCG<Mat, Prec, Traits>::vectorSolve(co
 template <typename Mat, typename Prec, typename Traits>
 template <typename RhsT, typename ResT>
 typename BiCGSTAB<Mat, Prec, Traits>::Scalar BiCGSTAB<Mat, Prec, Traits>::vectorSolve(const RhsT &b, ResT x) const {
-  typedef typename Traits::template MutableClone<RhsT>::Type Vector;
+  using Vector = typename Traits::template MutableClone<RhsT>::Type;
   Vector r;
 
   Scalar scale;
@@ -203,7 +203,7 @@ typename BiCGSTAB<Mat, Prec, Traits>::Scalar BiCGSTAB<Mat, Prec, Traits>::vector
 template <typename Mat, typename Prec, typename Traits>
 template <typename RhsT, typename ResT>
 typename CGS<Mat, Prec, Traits>::Scalar CGS<Mat, Prec, Traits>::vectorSolve(const RhsT &b, ResT x) const {
-  typedef typename Traits::template MutableClone<RhsT>::Type Vector;
+  using Vector = typename Traits::template MutableClone<RhsT>::Type;
   Vector r;
 
   Scalar scale;
@@ -253,10 +253,10 @@ typename CGS<Mat, Prec, Traits>::Scalar CGS<Mat, Prec, Traits>::vectorSolve(cons
 template <typename Mat, typename Prec, typename Traits>
 template <typename RhsT, typename ResT>
 typename GMRES<Mat, Prec, Traits>::Scalar GMRES<Mat, Prec, Traits>::vectorSolve(const RhsT &b, ResT x) const {
-  typedef typename Traits::template MutableClone<RhsT>::Type Vector;
-  typedef typename Traits::DynMatrix WorkMatrix;
-  typedef typename Traits::DynVector WorkVector;
-  typedef typename LocalProblemTraits<2, Scalar>::Matrix Matrix22;
+  using Vector = typename Traits::template MutableClone<RhsT>::Type;
+  using WorkMatrix = typename Traits::DynMatrix;
+  using WorkVector = typename Traits::DynVector;
+  using Matrix22 = typename LocalProblemTraits<2, Scalar>::Matrix;
 
   Vector r;
 
@@ -355,13 +355,13 @@ typename GMRES<Mat, Prec, Traits>::Scalar GMRES<Mat, Prec, Traits>::vectorSolve(
       //			          << V.leftCols( k+2 ) << std::endl
       //			          << "Orthogonality" << std::endl
       //			          << ( O.topLeftCorner(k+2,k+2) * O.topLeftCorner(k+2,k+2).transpose() -
-      //Matrix::Identity( k+2, k+2 ) ).squaredNorm() << std::endl
+      // Matrix::Identity( k+2, k+2 ) ).squaredNorm() << std::endl
       //			          << "Equality" << std::endl
       //			          << ( O.topLeftCorner(k+2,k+2) * H.topLeftCorner(k+2,k+1) -
-      //U.topLeftCorner(k+2,k+1) ).squaredNorm()<< std::endl
+      // U.topLeftCorner(k+2,k+1) ).squaredNorm()<< std::endl
       //			          << "Solve" << std::endl
       //			          << ( U.topLeftCorner( k+1, k+1 )*y - g.segment(0,k+1) ).transpose()<<
-      //std::endl
+      // std::endl
       //			          << "res" << std::endl
       //			          << g(k+1) << std::endl
       //			          << ( m_A*x - b ).norm()
@@ -391,7 +391,7 @@ typename GMRES<Mat, Prec, Traits>::Scalar GMRES<Mat, Prec, Traits>::vectorSolve(
 template <typename Mat, typename Prec, typename Traits>
 template <typename RhsT, typename ResT>
 typename TFQMR<Mat, Prec, Traits>::Scalar TFQMR<Mat, Prec, Traits>::vectorSolve(const RhsT &b, ResT x) const {
-  typedef typename Traits::template MutableClone<RhsT>::Type Vector;
+  using Vector = typename Traits::template MutableClone<RhsT>::Type;
   Vector r;
 
   Scalar scale;

@@ -40,10 +40,10 @@ namespace bogus {
 template <typename BlockMatrixType>
 class GaussSeidel : public GaussSeidelBase<GaussSeidel<BlockMatrixType>, BlockMatrixType> {
  public:
-  typedef GaussSeidelBase<GaussSeidel, BlockMatrixType> Base;
+  using Base = GaussSeidelBase<GaussSeidel, BlockMatrixType>;
 
-  typedef typename Base::GlobalProblemTraits GlobalProblemTraits;
-  typedef typename GlobalProblemTraits::Scalar Scalar;
+  using GlobalProblemTraits = typename Base::GlobalProblemTraits;
+  using Scalar = typename GlobalProblemTraits::Scalar;
 
   //! Default constructor -- you will have to call setMatrix() before using the solve() function
   GaussSeidel() : Base() {}
@@ -130,7 +130,7 @@ class GaussSeidel : public GaussSeidelBase<GaussSeidel<BlockMatrixType>, BlockMa
   void innerLoop(bool parallelize, const NSLaw &law, const RhsT &b, std::vector<unsigned char> &skip, Scalar &ndxRef,
                  ResT &x) const;
 
-  typedef typename Base::Index Index;
+  using Index = typename Base::Index;
 
   using Base::m_evalEvery;
   using Base::m_localMatrices;

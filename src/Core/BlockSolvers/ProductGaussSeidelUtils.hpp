@@ -30,7 +30,7 @@ namespace block_solvers_impl {
  */
 template <typename Type, bool IsScalar>
 struct DiagonalMatrixWrapper {
-  typedef Type Scalar;
+  using Scalar = Type;
   ConstantArray<Scalar> array;
   DiagonalMatrixWrapper(const Scalar& s = 1) : array(s) {}
 
@@ -40,8 +40,8 @@ struct DiagonalMatrixWrapper {
 };
 template <typename Type>
 struct DiagonalMatrixWrapper<Type, false> {
-  typedef typename Type::Index Index;
-  typedef typename Type::BlockPtr BlockPtr;
+  using Index = typename Type::Index;
+  using BlockPtr = typename Type::BlockPtr;
 
   DiagonalMatrixWrapper() : m_matrixPtr(nullptr) {}
   DiagonalMatrixWrapper(const Type& diag) : m_matrixPtr(&diag) { computeBlockIndices(); }
@@ -102,7 +102,7 @@ struct DMtStorage<MType, DType, true> {
 
  private:
   const MType* m_M;
-  typedef typename MType::template MutableImpl<typename MType::TransposeBlockType, false, true>::Type DMtType;
+  using DMtType = typename MType::template MutableImpl<typename MType::TransposeBlockType, false, true>::Type;
   DMtType m_DMt;
 };
 

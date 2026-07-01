@@ -91,7 +91,6 @@ typename ADMM<BlockMatrixType>::Scalar ADMM<BlockMatrixType>::solve(const NSLaw 
 
     res = this->eval(law, r, ut) + (this->usesInfinityNorm() ? (ut - z).template lpNorm<Eigen::Infinity>()
                                                              : (ut - z).squaredNorm() / (1 + ut.rows()));
-    ;
     this->callback().trigger(adIter, res);
 
     if (res < this->tol()) break;
@@ -166,7 +165,7 @@ typename DualAMA<BlockMatrixType>::Scalar DualAMA<BlockMatrixType>::solveWithLin
     const NSLaw &law, const BlockObjectBase<AType> &A, const BlockObjectBase<BType> &B, const BlockObjectBase<HType> &H,
     const PrecondT &preconditioner, const RhsT &f, const ORhsT &k, const RhsT &w, ResT &v, OResT &p, ResT &r,
     Scalar stepRatio) const {
-  typedef typename GlobalProblemTraits::DynVector DynVec;
+  using DynVec = typename GlobalProblemTraits::DynVector;
 
   Scalar lambda = projStepSize();
   const Scalar gamma = fpStepSize();
@@ -203,7 +202,7 @@ typename DualAMA<BlockMatrixType>::Scalar DualAMA<BlockMatrixType>::solveWithLin
     g2 = k;
     B.template multiply<false>(v + gamma * z, g2, 1, 1);
 
-    // Eval current reisual,  exit if small enough
+    // Eval current residual, exit if small enough
     res = this->eval(law, ut, r);     // Complementarity
     res += (this->usesInfinityNorm()  // Gap
                 ? z.template lpNorm<Eigen::Infinity>()

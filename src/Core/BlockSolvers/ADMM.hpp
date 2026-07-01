@@ -41,10 +41,10 @@ enum Variant {
 template <typename BlockMatrixType>
 class ADMM : public ConstrainedSolverBase<ADMM<BlockMatrixType>, BlockMatrixType> {
  public:
-  typedef ConstrainedSolverBase<ADMM, BlockMatrixType> Base;
+  using Base = ConstrainedSolverBase<ADMM, BlockMatrixType>;
 
-  typedef typename Base::GlobalProblemTraits GlobalProblemTraits;
-  typedef typename GlobalProblemTraits::Scalar Scalar;
+  using GlobalProblemTraits = typename Base::GlobalProblemTraits;
+  using Scalar = typename GlobalProblemTraits::Scalar;
 
   //! Default constructor -- you will have to call setMatrix() before using the solve() function
   ADMM() : Base() { init(); }
@@ -87,7 +87,7 @@ class ADMM : public ConstrainedSolverBase<ADMM<BlockMatrixType>, BlockMatrixType
   Scalar stepSize() const { return m_stepSize; }
 
  protected:
-  typedef typename Base::Index Index;
+  using Index = typename Base::Index;
 
   //! Sets up the default values for all parameters
   void init() {
@@ -114,12 +114,12 @@ class ADMM : public ConstrainedSolverBase<ADMM<BlockMatrixType>, BlockMatrixType
  */
 template <typename ObjectType>
 struct QuadraticProxOp {
-  typedef BlockMatrixTraits<ObjectType> BlockTraits;
-  typedef typename BlockTraits::Scalar Scalar;
-  typedef ProblemTraits<Scalar> GlobalProblemTraits;
+  using BlockTraits = BlockMatrixTraits<ObjectType>;
+  using Scalar = typename BlockTraits::Scalar;
+  using GlobalProblemTraits = ProblemTraits<Scalar>;
 
-  typedef BlockObjectBase<ObjectType> LinearOp;
-  typedef typename GlobalProblemTraits::DynVector AffineVec;
+  using LinearOp = BlockObjectBase<ObjectType>;
+  using AffineVec = typename GlobalProblemTraits::DynVector;
 
   //! Construct the proximal evaluator of a quadratic function
   /*!
@@ -172,10 +172,10 @@ struct QuadraticProxOp {
 template <typename BlockMatrixType>
 class DualAMA : public ConstrainedSolverBase<DualAMA<BlockMatrixType>, BlockMatrixType> {
  public:
-  typedef ConstrainedSolverBase<DualAMA, BlockMatrixType> Base;
+  using Base = ConstrainedSolverBase<DualAMA, BlockMatrixType>;
 
-  typedef typename Base::GlobalProblemTraits GlobalProblemTraits;
-  typedef typename GlobalProblemTraits::Scalar Scalar;
+  using GlobalProblemTraits = typename Base::GlobalProblemTraits;
+  using Scalar = typename GlobalProblemTraits::Scalar;
 
   //! Default constructor -- you will have to call setMatrix() before using the solve() function
   DualAMA() : Base() { init(); }
@@ -239,7 +239,7 @@ class DualAMA : public ConstrainedSolverBase<DualAMA<BlockMatrixType>, BlockMatr
   Scalar lineSearchPessimisticFactor() const { return m_lsPessimisticFactor; }
 
  protected:
-  typedef typename Base::Index Index;
+  using Index = typename Base::Index;
 
   //! Sets up the default values for all parameters
   void init() {

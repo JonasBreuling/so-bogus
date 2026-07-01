@@ -22,10 +22,10 @@ namespace bogus {
 template <typename GaussSeidelImpl, typename BlockMatrixType>
 class GaussSeidelBase : public ConstrainedSolverBase<GaussSeidelImpl, BlockMatrixType> {
  public:
-  typedef ConstrainedSolverBase<GaussSeidelImpl, BlockMatrixType> Base;
+  using Base = ConstrainedSolverBase<GaussSeidelImpl, BlockMatrixType>;
 
-  typedef typename Base::GlobalProblemTraits GlobalProblemTraits;
-  typedef typename GlobalProblemTraits::Scalar Scalar;
+  using GlobalProblemTraits = typename Base::GlobalProblemTraits;
+  using Scalar = typename GlobalProblemTraits::Scalar;
 
   //! Sets the maximum number of threads that the solver can use.
   /*! If \p maxThreads is zero, then it will use the current OpenMP setting.
@@ -117,8 +117,8 @@ class GaussSeidelBase : public ConstrainedSolverBase<GaussSeidelImpl, BlockMatri
   using Base::m_scaling;
   using Base::m_tol;
 
-  typedef typename Base::Index Index;
-  typedef typename Base::BlockProblemTraits::Matrix DiagonalBlockType;
+  using Index = typename Base::Index;
+  using DiagonalBlockType = typename Base::BlockProblemTraits::Matrix;
   typename ResizableSequenceContainer<DiagonalBlockType>::Type m_localMatrices;
   typename GlobalProblemTraits::DynVector m_regularization;
 

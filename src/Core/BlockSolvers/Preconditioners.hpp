@@ -60,7 +60,7 @@ struct MatrixPreconditioner {
     const PreconditionerMatrixType* m_preconditionerMatrix;
 
    public:
-    Type() : m_preconditionerMatrix(0) {}
+    Type() : m_preconditionerMatrix(nullptr) {}
 
     void setMatrix(const MatrixType&) {}
 

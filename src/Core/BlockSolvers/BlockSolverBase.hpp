@@ -27,12 +27,12 @@ namespace bogus {
 template <typename BlockMatrixType>
 class BlockSolverBase {
  public:
-  typedef BlockMatrixTraits<BlockMatrixType> BlockTraits;
-  typedef typename BlockTraits::Scalar Scalar;
-  typedef ProblemTraits<Scalar> GlobalProblemTraits;
-  typedef Signal<unsigned, Scalar> CallBackType;
+  using BlockTraits = BlockMatrixTraits<BlockMatrixType>;
+  using Scalar = typename BlockTraits::Scalar;
+  using GlobalProblemTraits = ProblemTraits<Scalar>;
+  using CallBackType = Signal<unsigned, Scalar>;
 
-  virtual ~BlockSolverBase() {}
+  virtual ~BlockSolverBase() = default;
 
   //! For iterative solvers: sets the maximum number of iterations
   void setMaxIters(unsigned maxIters) { m_maxIters = maxIters; }

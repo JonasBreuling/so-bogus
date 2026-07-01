@@ -21,8 +21,8 @@ namespace bogus {
 template <typename BlockMatrixType>
 class ProjectedGradient : public ConstrainedSolverBase<ProjectedGradient<BlockMatrixType>, BlockMatrixType> {
  public:
-  typedef ConstrainedSolverBase<ProjectedGradient, BlockMatrixType> Base;
-  typedef typename Base::Scalar Scalar;
+  using Base = ConstrainedSolverBase<ProjectedGradient, BlockMatrixType>;
+  using Scalar = typename Base::Scalar;
 
   //! Default constructor -- you will have to call setMatrix() before using the solve() function
   ProjectedGradient() : Base() { init(); }
@@ -81,7 +81,7 @@ class ProjectedGradient : public ConstrainedSolverBase<ProjectedGradient<BlockMa
   Scalar lineSearchArmijoCoefficient() const { return m_lsArmijoCoefficient; }
 
  protected:
-  typedef typename Base::Index Index;
+  using Index = typename Base::Index;
 
   //! Sets up the default values for all parameters
   void init() {

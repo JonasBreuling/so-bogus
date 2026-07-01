@@ -79,8 +79,8 @@ struct PgMethod {
   static typename ProjectedGradient<BlockMatrixType>::Scalar solve(const ProjectedGradient<BlockMatrixType> &pg,
                                                                    const NSLaw &law, const MatrixT &M, const RhsT &b,
                                                                    ResT &x) {
-    typedef ProjectedGradient<BlockMatrixType> PgType;
-    typedef typename PgType::Scalar Scalar;
+    using PgType = ProjectedGradient<BlockMatrixType>;
+    using Scalar = typename PgType::Scalar;
     typename PgType::GlobalProblemTraits::DynVector Mx(b.rows()),
         y(b.rows()),   // = Mx +b  (gradient)
         xs(x.rows()),  // tentative new value for x
@@ -160,8 +160,8 @@ struct PgMethod<projected_gradient::Standard> {
   static typename ProjectedGradient<BlockMatrixType>::Scalar solve(const ProjectedGradient<BlockMatrixType> &pg,
                                                                    const NSLaw &law, const MatrixT &M, const RhsT &b,
                                                                    ResT &x) {
-    typedef ProjectedGradient<BlockMatrixType> PgType;
-    typedef typename PgType::Scalar Scalar;
+    using PgType = ProjectedGradient<BlockMatrixType>;
+    using Scalar = typename PgType::Scalar;
     typename PgType::GlobalProblemTraits::DynVector Mx(b.rows()),
         y(b.rows()),   // = Mx +b  (gradient)
         xs(x.rows()),  // tentative new value for x
@@ -214,8 +214,8 @@ struct PgMethod<projected_gradient::Conjugated> {
   static typename ProjectedGradient<BlockMatrixType>::Scalar solve(const ProjectedGradient<BlockMatrixType> &pg,
                                                                    const NSLaw &law, const MatrixT &M, const RhsT &b,
                                                                    ResT &x) {
-    typedef ProjectedGradient<BlockMatrixType> PgType;
-    typedef typename PgType::Scalar Scalar;
+    using PgType = ProjectedGradient<BlockMatrixType>;
+    using Scalar = typename PgType::Scalar;
     typename PgType::GlobalProblemTraits::DynVector Mx(b.rows()),
         y(b.rows()),   // = Mx +b  (gradient)
         xs(x.rows()),  // tentative new value for x
@@ -291,8 +291,8 @@ struct PgMethod<projected_gradient::SPG> {
   static typename ProjectedGradient<BlockMatrixType>::Scalar solve(const ProjectedGradient<BlockMatrixType> &pg,
                                                                    const NSLaw &law, const MatrixT &M, const RhsT &b,
                                                                    ResT &x) {
-    typedef ProjectedGradient<BlockMatrixType> PgType;
-    typedef typename PgType::Scalar Scalar;
+    using PgType = ProjectedGradient<BlockMatrixType>;
+    using Scalar = typename PgType::Scalar;
     typename PgType::GlobalProblemTraits::DynVector Mx(b.rows()),
         y(b.rows()),   // = Mx +b  (gradient)
         xs(x.rows()),  // tentative new value for x

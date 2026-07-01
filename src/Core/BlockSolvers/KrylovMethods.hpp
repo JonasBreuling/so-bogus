@@ -40,10 +40,10 @@ namespace krylov {
 template <template <typename, typename, typename> class Method, typename Matrix, typename Preconditioner,
           typename Traits>
 struct KrylovSolverBase : public LinearSolverBase<Method<Matrix, Preconditioner, Traits> > {
-  typedef Method<Matrix, Preconditioner, Traits> Derived;
-  typedef LinearSolverBase<Derived> Base;
-  typedef typename Traits::Scalar Scalar;
-  typedef Signal<unsigned, Scalar> SignalType;
+  using Derived = Method<Matrix, Preconditioner, Traits>;
+  using Base = LinearSolverBase<Derived>;
+  using Scalar = typename Traits::Scalar;
+  using SignalType = Signal<unsigned, Scalar>;
 
   const Matrix *m_A;
   const Preconditioner *m_P;
@@ -73,7 +73,7 @@ struct KrylovSolverBase : public LinearSolverBase<Method<Matrix, Preconditioner,
   //! Returns the solution \b x of the linear system \b M \c * \b x \c = \c rhs
   template <typename RhsT>
   typename LinearSolverTraits<Derived>::template Result<RhsT>::Type solve(const RhsT &rhs) const {
-    typedef typename LinearSolverTraits<Derived>::template Result<RhsT>::Type ReturnType;
+    using ReturnType = typename LinearSolverTraits<Derived>::template Result<RhsT>::Type;
     static ReturnType s_cachedRes;
 
     if (!m_enableResCaching) {
@@ -129,9 +129,9 @@ namespace solvers {
 
 // Useful macros for common declarations
 
-#define BOGUS_MAKE_KRYLOV_SOLVER_TYPEDEFS(MethodName)                                 \
-  typedef KrylovSolverBase<solvers::MethodName, Matrix, Preconditioner, Traits> Base; \
-  typedef typename Traits::Scalar Scalar;                                             \
+#define BOGUS_MAKE_KRYLOV_SOLVER_ALIASES(MethodName)                                  \
+  using Base = KrylovSolverBase<solvers::MethodName, Matrix, Preconditioner, Traits>; \
+  using Scalar = typename Traits::Scalar;                                             \
                                                                                       \
   using Base::m_A;                                                                    \
   using Base::m_P;                                                                    \
@@ -140,7 +140,7 @@ namespace solvers {
   using Base::m_callback;
 
 #define BOGUS_MAKE_KRYLOV_SOLVER_HEADER(MethodName)                                                  \
-  BOGUS_MAKE_KRYLOV_SOLVER_TYPEDEFS(MethodName)                                                      \
+  BOGUS_MAKE_KRYLOV_SOLVER_ALIASES(MethodName)                                                       \
   MethodName(const Matrix &A, unsigned maxIters, Scalar tol = NumTraits<Scalar>::epsilon(),          \
              const Preconditioner *P = nullptr, const typename Base::SignalType *callback = nullptr) \
       : Base(A, maxIters, tol, P, callback) {}                                                       \
@@ -228,7 +228,7 @@ struct CGS : public KrylovSolverBase<CGS, Matrix, Preconditioner, Traits> {
 template <typename Matrix, typename Preconditioner = TrivialPreconditioner<Matrix>,
           typename Traits = ProblemTraits<typename MatrixTraits<Matrix>::Scalar> >
 struct GMRES : public KrylovSolverBase<GMRES, Matrix, Preconditioner, Traits> {
-  BOGUS_MAKE_KRYLOV_SOLVER_TYPEDEFS(GMRES)
+  BOGUS_MAKE_KRYLOV_SOLVER_ALIASES(GMRES)
 
   GMRES() : Base(), m_restart(0) {}
 
@@ -273,17 +273,17 @@ struct TFQMR : public KrylovSolverBase<TFQMR, Matrix, Preconditioner, Traits> {
 #define BOGUS_PROCESS_KRYLOV_METHOD(MethodName)                                                                        \
   template <typename Matrix, typename Preconditioner, class Traits>                                                    \
   struct LinearSolverTraits<krylov::solvers::MethodName<Matrix, Preconditioner, Traits> > {                            \
-    typedef Matrix MatrixType;                                                                                         \
+    using MatrixType = Matrix;                                                                                         \
     template <typename RhsT>                                                                                           \
     struct Result {                                                                                                    \
-      typedef typename Traits::template MutableClone<RhsT>::Type Type;                                                 \
+      using Type = typename Traits::template MutableClone<RhsT>::Type;                                                 \
     };                                                                                                                 \
   };                                                                                                                   \
   template <typename Matrix, typename Preconditioner, class Traits, typename RhsBlockT, bool TransposeLhs,             \
             bool TransposeRhs>                                                                                         \
   struct BlockBlockProductTraits<krylov::solvers::MethodName<Matrix, Preconditioner, Traits>, RhsBlockT, TransposeLhs, \
                                  TransposeRhs> {                                                                       \
-    typedef typename BlockBlockProductTraits<Matrix, RhsBlockT, TransposeLhs, TransposeRhs>::ReturnType ReturnType;    \
+    using ReturnType = typename BlockBlockProductTraits<Matrix, RhsBlockT, TransposeLhs, TransposeRhs>::ReturnType;    \
   };
 
 BOGUS_KRYLOV_METHODS

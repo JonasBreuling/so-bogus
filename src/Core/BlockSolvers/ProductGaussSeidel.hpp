@@ -40,14 +40,14 @@ template <typename BlockMatrixType, typename DiagonalType = typename BlockMatrix
 class ProductGaussSeidel
     : public GaussSeidelBase<ProductGaussSeidel<BlockMatrixType, DiagonalType, PrecomputeDMt>, BlockMatrixType> {
  public:
-  typedef GaussSeidelBase<ProductGaussSeidel, BlockMatrixType> Base;
+  using Base = GaussSeidelBase<ProductGaussSeidel, BlockMatrixType>;
 
-  typedef typename Base::GlobalProblemTraits GlobalProblemTraits;
-  typedef typename GlobalProblemTraits::Scalar Scalar;
+  using GlobalProblemTraits = typename Base::GlobalProblemTraits;
+  using Scalar = typename GlobalProblemTraits::Scalar;
 
   enum { has_trivial_diagonal = std::is_same_v<DiagonalType, typename BlockMatrixType::Scalar> };
-  typedef block_solvers_impl::DiagonalMatrixWrapper<DiagonalType, !!has_trivial_diagonal> DiagWrapper;
-  typedef block_solvers_impl::DMtStorage<BlockMatrixType, DiagWrapper, PrecomputeDMt> DMtStorage;
+  using DiagWrapper = block_solvers_impl::DiagonalMatrixWrapper<DiagonalType, !!has_trivial_diagonal>;
+  using DMtStorage = block_solvers_impl::DMtStorage<BlockMatrixType, DiagWrapper, PrecomputeDMt>;
 
   //! Default constructor -- you will have to call setMatrix() before using the solve() function
   ProductGaussSeidel() : Base() {}
@@ -118,7 +118,7 @@ class ProductGaussSeidel
   void innerLoop(bool parallelize, const NSLaw &law, const VecT &b, std::vector<unsigned char> &skip, Scalar &ndxRef,
                  VecT &Mx, ResT &x) const;
 
-  typedef typename Base::Index Index;
+  using Index = typename Base::Index;
 
   using Base::m_evalEvery;
   using Base::m_localMatrices;

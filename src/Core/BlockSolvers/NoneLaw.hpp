@@ -8,8 +8,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef BOGUS_NoneLAW_HPP
-#define BOGUS_NoneLAW_HPP
+#ifndef BOGUS_NONELAW_HPP
+#define BOGUS_NONELAW_HPP
 
 #include <cmath>
 
@@ -27,13 +27,13 @@ class NoneLaw {
   enum { dimension = 1 };
   // enum{ dimension = internal::DYNAMIC } ;
 
-  typedef LocalProblemTraits<dimension, Scalar> Traits;
+  using Traits = LocalProblemTraits<dimension, Scalar>;
 
   //! Constructor
   NoneLaw() {}
 
   //! Projects x on \f$ R \f$. This is a none operation.
-  void projectOnConstraint(const unsigned problemIndex, typename Traits::Vector &x) const {};
+  void projectOnConstraint(const unsigned problemIndex, typename Traits::Vector &x) const {}
 
   //! \return \f$ 0 \f$
   Scalar eval(const unsigned problemIndex, const typename Traits::Vector &x, const typename Traits::Vector &y) const {

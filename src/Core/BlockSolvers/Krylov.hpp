@@ -31,11 +31,11 @@ namespace bogus {
 template <typename BlockMatrixType, template <typename BlockMatrixT> class PreconditionerType>
 class Krylov : public BlockSolverBase<BlockMatrixType> {
  public:
-  typedef BlockSolverBase<BlockMatrixType> Base;
-  typedef PreconditionerType<BlockObjectBase<BlockMatrixType> > PreconditionerImplType;
+  using Base = BlockSolverBase<BlockMatrixType>;
+  using PreconditionerImplType = PreconditionerType<BlockObjectBase<BlockMatrixType> >;
 
-  typedef typename Base::GlobalProblemTraits GlobalProblemTraits;
-  typedef typename GlobalProblemTraits::Scalar Scalar;
+  using GlobalProblemTraits = typename Base::GlobalProblemTraits;
+  using Scalar = typename GlobalProblemTraits::Scalar;
 
   //! Default constructor -- you will have to call setMatrix() before using any of the solve() functions
   Krylov();
@@ -45,21 +45,21 @@ class Krylov : public BlockSolverBase<BlockMatrixType> {
   //! Sets the system matrix and initializes the preconditioner
   Krylov &setMatrix(const BlockObjectBase<BlockMatrixType> &matrix);
 
-  // For each value of the krylov::Method enum, create a MethodNameType typedef
+  // For each value of the krylov::Method enum, create a MethodNameType alias
   // and the asMethodName() -> MethodNameType and solve_MethodName -> Scalar methods
-#define BOGUS_PROCESS_KRYLOV_METHOD(MethodName)                                                               \
-  typedef krylov::solvers::MethodName<BlockMatrixType, PreconditionerType<BlockObjectBase<BlockMatrixType> >, \
-                                      GlobalProblemTraits>                                                    \
-      MethodName##Type;                                                                                       \
-                                                                                                              \
-  MethodName##Type as##MethodName() const {                                                                   \
-    return MethodName##Type(Base::m_matrix->derived(), Base::m_maxIters, Base::m_tol, &m_preconditioner,      \
-                            &this->m_callback);                                                               \
-  }                                                                                                           \
-                                                                                                              \
-  template <typename RhsT, typename ResT>                                                                     \
-  Scalar solve_##MethodName(const RhsT &b, ResT &x) const {                                                   \
-    return as##MethodName().solve(b, x);                                                                      \
+#define BOGUS_PROCESS_KRYLOV_METHOD(MethodName)                                                           \
+  using MethodName##Type =                                                                                \
+      krylov::solvers::MethodName<BlockMatrixType, PreconditionerType<BlockObjectBase<BlockMatrixType> >, \
+                                  GlobalProblemTraits>;                                                   \
+                                                                                                          \
+  MethodName##Type as##MethodName() const {                                                               \
+    return MethodName##Type(Base::m_matrix->derived(), Base::m_maxIters, Base::m_tol, &m_preconditioner,  \
+                            &this->m_callback);                                                           \
+  }                                                                                                       \
+                                                                                                          \
+  template <typename RhsT, typename ResT>                                                                 \
+  Scalar solve_##MethodName(const RhsT &b, ResT &x) const {                                               \
+    return as##MethodName().solve(b, x);                                                                  \
   }
 
   BOGUS_KRYLOV_METHODS

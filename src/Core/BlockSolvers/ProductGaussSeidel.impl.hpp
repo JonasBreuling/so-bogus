@@ -103,7 +103,7 @@ SelfProductAccumulator<D, T> accumulate(const D& diag, T& res) {
   return SelfProductAccumulator<D, T>(diag, res);
 }
 
-}  // block_solvers_impl
+}  // namespace block_solvers_impl
 
 template <typename BlockMatrixType, typename DiagonalType, bool PrecomputeDMt>
 ProductGaussSeidel<BlockMatrixType, DiagonalType, PrecomputeDMt>&
@@ -154,7 +154,7 @@ void ProductGaussSeidel<BlockMatrixType, DiagonalType, PrecomputeDMt>::innerLoop
                                                                                  std::vector<unsigned char>& skip,
                                                                                  Scalar& ndxRef, VecT& Mx,
                                                                                  ResT& x) const {
-  typedef typename NSLaw::Traits LocalProblemTraits;
+  using LocalProblemTraits = typename NSLaw::Traits;
 
   Segmenter<NSLaw::dimension, ResT, typename BlockMatrixType::Index> xSegmenter(x, m_matrix->rowOffsets());
   const Segmenter<NSLaw::dimension, const VecT, typename BlockMatrixType::Index> bSegmenter(b, m_matrix->rowOffsets());

@@ -27,7 +27,7 @@ void PyramidLaw<Dimension, Scalar, DeSaxceCOV>::projectOnConstraint(const unsign
                                                                     typename Traits::Vector &x) const {
   static_assert(Dimension < 4u, "NOT_IMPLEMENTED");
 
-  typedef typename LocalProblemTraits<Dimension - 1, Scalar>::Array TgComp;
+  using TgComp = typename LocalProblemTraits<Dimension - 1, Scalar>::Array;
   const Scalar mu = m_mu[problemIndex];
 
   const Scalar mun = mu * Traits::np(x);
@@ -114,12 +114,12 @@ bool PyramidLaw<Dimension, Scalar, DeSaxceCOV>::solveLocal(const unsigned proble
 template <DenseIndexType Dimension, typename Scalar, bool DeSaxceCOV>
 Scalar PyramidLaw<Dimension, Scalar, DeSaxceCOV>::eval(const unsigned problemIndex, const typename Traits::Vector &x,
                                                        const typename Traits::Vector &ycov) const {
-  typedef typename LocalProblemTraits<Dimension - 1, Scalar>::Array TgComp;
+  using TgComp = typename LocalProblemTraits<Dimension - 1, Scalar>::Array;
   const Scalar mu = m_mu[problemIndex];
 
   typename Traits::Vector y = ycov;
   if (!DeSaxceCOV) {
-    // Remove controbution from change of variable
+    // Remove contribution from change of variable
     dualityCOV(problemIndex, ycov, y);
     y = ycov - y;
   }

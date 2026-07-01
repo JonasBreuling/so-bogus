@@ -63,7 +63,7 @@ template <typename BlockMatrixType>
 template <typename NSLaw, typename RhsT, typename ResT>
 void GaussSeidel<BlockMatrixType>::innerLoop(bool parallelize, const NSLaw &law, const RhsT &b,
                                              std::vector<unsigned char> &skip, Scalar &ndxRef, ResT &x) const {
-  typedef typename NSLaw::Traits LocalProblemTraits;
+  using LocalProblemTraits = typename NSLaw::Traits;
   const Index dimension = Base::BlockProblemTraits::dimension;
 
   Segmenter<dimension, ResT, typename BlockMatrixType::Index> xSegmenter(x, m_matrix->rowOffsets());

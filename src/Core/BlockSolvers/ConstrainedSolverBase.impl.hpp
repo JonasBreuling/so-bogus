@@ -27,7 +27,7 @@ typename ConstrainedSolverBase<Derived, BlockMatrixType>::Scalar ConstrainedSolv
   const Segmenter<dimension, const RhsT, typename BlockMatrixType::Index> xSegmenter(x, m_matrix->rowOffsets());
   const Segmenter<dimension, const ResT, typename BlockMatrixType::Index> ySegmenter(y, m_matrix->rowOffsets());
 
-  typedef typename BlockMatrixTraits<BlockMatrixType>::Index Index;
+  using Index = typename BlockMatrixTraits<BlockMatrixType>::Index;
 
   const Index n = m_matrix->rowsOfBlocks();
 
@@ -85,9 +85,9 @@ void estimate_row_scaling(const BlockObjectBase<Derived> &, typename BlockObject
 
 template <typename Derived>
 void estimate_row_scaling(const BlockMatrixBase<Derived> &mat, typename Derived::Scalar *scalings) {
-  typedef BlockMatrixTraits<Derived> BlockTraits;
-  typedef typename BlockTraits::BlockType LocalMatrixType;
-  typedef MatrixTraits<LocalMatrixType> Traits;
+  using BlockTraits = BlockMatrixTraits<Derived>;
+  using LocalMatrixType = typename BlockTraits::BlockType;
+  using Traits = MatrixTraits<LocalMatrixType>;
 
   // For square matrices, estimate diag block
   if (mat.rows() == mat.cols() && mat.rowsOfBlocks() == mat.colsOfBlocks()) {

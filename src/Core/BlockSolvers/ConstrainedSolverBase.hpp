@@ -17,14 +17,14 @@ namespace bogus {
 
 template <typename Derived, typename BlockMatrixType>
 class ConstrainedSolverBase : public BlockSolverBase<BlockMatrixType> {
-  typedef BlockSolverBase<BlockMatrixType> Base;
+  using Base = BlockSolverBase<BlockMatrixType>;
 
  public:
-  typedef typename Base::GlobalProblemTraits GlobalProblemTraits;
-  typedef typename GlobalProblemTraits::Scalar Scalar;
-  typedef typename BlockMatrixTraits<BlockMatrixType>::Index Index;
+  using GlobalProblemTraits = typename Base::GlobalProblemTraits;
+  using Scalar = typename GlobalProblemTraits::Scalar;
+  using Index = typename BlockMatrixTraits<BlockMatrixType>::Index;
 
-  typedef LocalProblemTraits<Base::BlockTraits::RowsPerBlock, Scalar> BlockProblemTraits;
+  using BlockProblemTraits = LocalProblemTraits<Base::BlockTraits::RowsPerBlock, Scalar>;
 
   //! Sets whether the solver will use the infinity norm instead of the l1 one to compute the global residual from the
   //! local ones

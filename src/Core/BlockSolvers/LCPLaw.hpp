@@ -26,7 +26,7 @@ class LCPLaw {
  public:
   enum { dimension = 1 };
 
-  typedef LocalProblemTraits<dimension, Scalar> Traits;
+  using Traits = LocalProblemTraits<dimension, Scalar>;
 
   //! Constructor
   LCPLaw() {}
@@ -47,7 +47,7 @@ class LCPLaw {
   //! This NSLaw is always associated, so dualityCOV is null.
   template <typename Segment>
   void dualityCOV(const unsigned, const Segment &, typename Traits::Vector &s) const {
-    s->setZero();
+    s.setZero();
   }
 };
 

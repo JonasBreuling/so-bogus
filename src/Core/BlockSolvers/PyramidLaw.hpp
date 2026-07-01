@@ -28,7 +28,7 @@ namespace bogus {
 template <DenseIndexType Dimension, typename Scalar, bool DeSaxceCOV>
 class PyramidLaw {
  public:
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
   enum { dimension = Dimension };
 
   //! Constructor

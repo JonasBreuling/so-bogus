@@ -67,8 +67,8 @@ set(BOGUS_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
 add_library(bogus INTERFACE)
 add_library(bogus::bogus ALIAS bogus)
  
-# Require C++14 from consumers (Eigen 3.5+ (5.0+) demands it anyway)
-target_compile_features(bogus INTERFACE cxx_std_14)
+# Require C++17 from consumers
+target_compile_features(bogus INTERFACE cxx_std_17)
  
 # Build-tree includes point at src/; installed tree includes point at
 # <prefix>/include/bogus/ so users always write  #include <Core/...>

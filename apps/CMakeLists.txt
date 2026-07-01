@@ -19,15 +19,10 @@ if(TARGET Boost::serialization)
     "${CMAKE_CURRENT_SOURCE_DIR}/LoadFrictionProblem.cpp"
   )
   target_link_libraries(LoadFrictionProblem PRIVATE bogus::sobogus)
-  # TODO: Fix this!
-#   target_compile_options(LoadFrictionProblem PRIVATE
-#     $<$<OR:
-#         $<CXX_COMPILER_ID:GNU>,
-#         $<CXX_COMPILER_ID:Clang>,
-#         $<CXX_COMPILER_ID:AppleClang>>:
-#       -Wall -Wextra -Wno-ignored-attributes>
-#     $<$<CXX_COMPILER_ID:MSVC>:/W3>
-#   )
+  target_compile_options(LoadFrictionProblem PRIVATE
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall -Wextra -Wno-ignored-attributes>
+    $<$<CXX_COMPILER_ID:MSVC>:/W3>
+  )
   message(STATUS "bogus: app LoadFrictionProblem – enabled")
 else()
   message(STATUS
@@ -38,21 +33,16 @@ endif()
 # Reads FCLib HDF5 friction-contact problems and solves them.
 # Requires the FCLib library (set FCLIB_ROOT env-var for non-standard installs).
 find_package(FCLib QUIET)   # uses cmake/FindFCLib.cmake
-if(FCLIB_FOUND)
+if(FCLib_FOUND)
   add_executable(FCLibLoader
     "${CMAKE_CURRENT_SOURCE_DIR}/FCLibLoader.cpp"
   )
-  target_include_directories(FCLibLoader PRIVATE "${FCLib_INCLUDE_DIRS}")
   target_link_libraries(FCLibLoader PRIVATE
     bogus::sobogus
-    "${FCLib_LIBRARIES}"
+    FCLib::FCLib
   )
   target_compile_options(FCLibLoader PRIVATE
-    $<$<OR:
-        $<CXX_COMPILER_ID:GNU>,
-        $<CXX_COMPILER_ID:Clang>,
-        $<CXX_COMPILER_ID:AppleClang>>:
-      -Wall -Wextra -Wno-ignored-attributes>
+    $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall -Wextra -Wno-ignored-attributes>
     $<$<CXX_COMPILER_ID:MSVC>:/W3>
   )
   message(STATUS "bogus: app FCLibLoader – enabled")

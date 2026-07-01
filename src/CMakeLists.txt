@@ -26,16 +26,10 @@ target_compile_definitions(sobogus PRIVATE
 )
 
 # Compiler warnings – applied only to this target, not propagated
-# TODO: Fix this
-# target_compile_options(sobogus PRIVATE
-#   $<$<OR:
-#       $<CXX_COMPILER_ID:GNU>,
-#       $<CXX_COMPILER_ID:Clang>,
-#       $<CXX_COMPILER_ID:AppleClang>>:
-#     -Wall -Wextra -Wno-ignored-attributes>
-#   $<$<CXX_COMPILER_ID:MSVC>:
-#     /W3 /wd4305>
-# )
+target_compile_options(sobogus PRIVATE
+  $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall -Wextra -Wno-ignored-attributes>
+  $<$<CXX_COMPILER_ID:MSVC>:/W3 /wd4305>
+)
 
 set_target_properties(sobogus PROPERTIES
   VERSION                 ${PROJECT_VERSION}

@@ -2,7 +2,6 @@
 # Pulls Google Test at configure time via FetchContent (no internet dependency
 # at build time after the first configure).
 # ─────────────────────────────────────────────────────────────────────────────
-cmake_minimum_required(VERSION 3.14)
 
 include(FetchContent)
 
@@ -50,16 +49,10 @@ target_link_libraries(testbogus PRIVATE
 )
 
 # Compiler warnings for the test binary (not propagated)
-# TODO: Fix this!
-# target_compile_options(testbogus PRIVATE
-#   $<$<OR:
-#       $<CXX_COMPILER_ID:GNU>,
-#       $<CXX_COMPILER_ID:Clang>,
-#       $<CXX_COMPILER_ID:AppleClang>>:
-#     -Wall -Wextra -Wno-ignored-attributes>
-#   $<$<CXX_COMPILER_ID:MSVC>:
-#     /W3 /wd4305>
-# )
+target_compile_options(testbogus PRIVATE
+  $<$<OR:$<CXX_COMPILER_ID:GNU>,$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>>:-Wall -Wextra -Wno-ignored-attributes>
+  $<$<CXX_COMPILER_ID:MSVC>:/W3 /wd4305>
+)
 
 # ── Register with CTest ───────────────────────────────────────────────────────
 include(GoogleTest)

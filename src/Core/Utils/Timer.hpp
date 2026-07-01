@@ -6,69 +6,30 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-*/
+ */
 
 #ifndef BOGUS_TIMER_HPP
 #define BOGUS_TIMER_HPP
 
-#ifdef WIN32
-#include <Winbase.h>
-#else
-#include <sys/time.h>
-#endif
+#include <chrono>
 
-namespace bogus
-{
+namespace bogus {
 
 //! Simple timer class. Starts when constructed.
 class Timer {
-public:
-	Timer()
-	{
-#ifdef WIN32
-		LARGE_INTEGER proc_freq;
-		::QueryPerformanceFrequency(&proc_freq) ;
-		m_freq = proc_freq.QuadPart ;
-#endif
-		reset() ;
-	}
+ public:
+  Timer() { reset(); }
 
-	//! Resturns the elapsed time, in seconds, since the last call to reset()
-	double elapsed()
-	{
-#ifdef WIN32
-		LARGE_INTEGER stop;
-		::QueryPerformanceCounter(&stop);
-		return (( stop.QuadPart - m_start.QuadPart) / m_frequency);
-#else
-		struct timeval stop ;
-		gettimeofday( &stop, 0 ) ;
-		return stop.tv_sec - m_start.tv_sec
-				+ 1.e-6 * ( stop.tv_usec - m_start.tv_usec ) ;
-#endif
-	}
+  //! Returns the elapsed time, in seconds, since the last call to reset()
+  double elapsed() const { return std::chrono::duration<double>(std::chrono::steady_clock::now() - m_start).count(); }
 
-	//! Restarts the timer
-	void reset()
-	{
-#ifdef WIN32
-		::QueryPerformanceCounter(&m_start);
-#else
-		gettimeofday( &m_start, 0 ) ;
-#endif
-	}
+  //! Restarts the timer
+  void reset() { m_start = std::chrono::steady_clock::now(); }
 
-private:
-
-#ifdef WIN32
-	double m_freq ;
-	LARGE_INTEGER m_start;
-#else
-	struct timeval m_start ;
-#endif
-
+ private:
+  std::chrono::steady_clock::time_point m_start;
 };
 
-} //namespace bogus
+}  // namespace bogus
 
 #endif

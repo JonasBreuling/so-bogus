@@ -28,9 +28,9 @@ namespace bogus {
 template <DenseIndexType Dimension, typename Scalar, bool DeSaxceCOV,
           local_soc_solver::Strategy Strat = local_soc_solver::Hybrid>
 struct LocalSOCSolver {
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
-  typedef typename Traits::Vector Vector;
-  typedef typename Traits::Matrix Matrix;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
+  using Vector = typename Traits::Vector;
+  using Matrix = typename Traits::Matrix;
 
   static Scalar solve(const typename Traits::Matrix &A, const typename Traits::Vector &b, typename Traits::Vector &x,
                       const Scalar mu, const Scalar tol, const Scalar scaling = 1);

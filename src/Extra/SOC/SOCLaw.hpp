@@ -41,7 +41,7 @@ namespace bogus {
 template <DenseIndexType Dimension, typename Scalar, bool DeSaxceCOV, local_soc_solver::Strategy Strat>
 class SOCLaw {
  public:
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
   enum { dimension = Dimension };
 
   //! Constructor
@@ -53,7 +53,7 @@ class SOCLaw {
 
   //! \return \f$ \vert fb( mu, x, y ) \vert^2_2 \f$, where fb is the SOC Fischer-Burmeister function
   Scalar eval(const unsigned problemIndex, const typename Traits::Vector &x, const typename Traits::Vector &y) const {
-    typedef FischerBurmeister<Traits::dimension, typename Traits::Scalar, DeSaxceCOV> FBFunction;
+    using FBFunction = FischerBurmeister<Traits::dimension, typename Traits::Scalar, DeSaxceCOV>;
 
     if (m_mu[problemIndex] < 0) return y.squaredNorm();
 
@@ -105,13 +105,13 @@ class SOCLaw {
 };
 
 //! Predefined non-smooth law for 2D Coulomb friction
-typedef SOCLaw<2, double, true> Coulomb2D;
+using Coulomb2D = SOCLaw<2, double, true>;
 //! Predefined non-smooth law for 3D Coulomb friction
-typedef SOCLaw<3, double, true> Coulomb3D;
+using Coulomb3D = SOCLaw<3, double, true>;
 //! Predefined non-smooth law for 2D SOC complementarity
-typedef SOCLaw<2, double, false> SOC2D;
+using SOC2D = SOCLaw<2, double, false>;
 //! Predefined non-smooth law for 3D SOC complementarity
-typedef SOCLaw<3, double, false> SOC3D;
+using SOC3D = SOCLaw<3, double, false>;
 
 }  // namespace bogus
 

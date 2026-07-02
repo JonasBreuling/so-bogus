@@ -34,9 +34,9 @@ namespace bogus {
 // No analytic solution in the general case
 template <DenseIndexType Dimension, typename Scalar, bool DeSaxceCOV>
 struct AnalyticLocalSOCSolver {
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
-  typedef typename Traits::Vector Vector;
-  typedef typename Traits::Matrix Matrix;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
+  using Vector = typename Traits::Vector;
+  using Matrix = typename Traits::Matrix;
 
   static bool solveOrthogonality(const typename Traits::Matrix &, const typename Traits::Vector &,
                                  typename Traits::Vector &, const Scalar) {
@@ -48,16 +48,16 @@ struct AnalyticLocalSOCSolver {
 template <typename Scalar>
 struct AnalyticLocalSOCSolver<3u, Scalar, true> {
   enum { Dimension = 3 };
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
-  typedef typename Traits::Vector Vector;
-  typedef typename Traits::Matrix Matrix;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
+  using Vector = typename Traits::Vector;
+  using Matrix = typename Traits::Matrix;
 
   static bool solveOrthogonality(const typename Traits::Matrix &W, const typename Traits::Vector &b,
                                  typename Traits::Vector &r, const Scalar mu) {
     // see [Daviet et al 2011], Appendix B.1
 
-    typedef typename LocalProblemTraits<2, Scalar>::Vector Vec2;
-    typedef typename LocalProblemTraits<2, Scalar>::Matrix Mat2;
+    using Vec2 = typename LocalProblemTraits<2, Scalar>::Vector;
+    using Mat2 = typename LocalProblemTraits<2, Scalar>::Matrix;
 
     const Scalar wN = W(0, 0);
     if (wN < NumTraits<Scalar>::epsilon()) return false;  // Could we do something better ?
@@ -106,9 +106,9 @@ struct AnalyticLocalSOCSolver<3u, Scalar, true> {
 template <typename Scalar>
 struct AnalyticLocalSOCSolver<2u, Scalar, true> {
   enum { Dimension = 2 };
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
-  typedef typename Traits::Vector Vector;
-  typedef typename Traits::Matrix Matrix;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
+  using Vector = typename Traits::Vector;
+  using Matrix = typename Traits::Matrix;
 
   static bool solveOrthogonality(const typename Traits::Matrix &W, const typename Traits::Vector &b,
                                  typename Traits::Vector &r, const Scalar mu) {
@@ -142,9 +142,9 @@ struct AnalyticLocalSOCSolver<2u, Scalar, true> {
 template <typename Scalar>
 struct AnalyticLocalSOCSolver<3u, Scalar, false> {
   enum { Dimension = 3 };
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
-  typedef typename Traits::Vector Vector;
-  typedef typename Traits::Matrix Matrix;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
+  using Vector = typename Traits::Vector;
+  using Matrix = typename Traits::Matrix;
 
   static bool solveOrthogonality(const typename Traits::Matrix &W, const typename Traits::Vector &b,
                                  typename Traits::Vector &r, const Scalar mu) {
@@ -213,9 +213,9 @@ struct AnalyticLocalSOCSolver<3u, Scalar, false> {
 template <typename Scalar>
 struct AnalyticLocalSOCSolver<2u, Scalar, false> {
   enum { Dimension = 2 };
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
-  typedef typename Traits::Vector Vector;
-  typedef typename Traits::Matrix Matrix;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
+  using Vector = typename Traits::Vector;
+  using Matrix = typename Traits::Matrix;
 
   static bool solveOrthogonality(const typename Traits::Matrix &W, const typename Traits::Vector &b,
                                  typename Traits::Vector &r, const Scalar mu) {
@@ -253,8 +253,8 @@ Scalar LocalSOCSolver<Dimension, Scalar, DeSaxceCOV, Strat>::solve(const typenam
   // see [Daviet et al 2011], Appendix B.2
 
   // Newton solver
-  typedef FischerBurmeister<Dimension, Scalar, DeSaxceCOV> FBFunc;
-  typedef typename Traits::LUType LUType;
+  using FBFunc = FischerBurmeister<Dimension, Scalar, DeSaxceCOV>;
+  using LUType = typename Traits::LUType;
 
   FBFunc fb(mu, A, b, scaling);
   NonSmoothNewton<FBFunc> nsNewton(fb, tol);
@@ -310,7 +310,7 @@ Scalar LocalSOCSolver<Dimension, Scalar, DeSaxceCOV, Strat>::solve(const typenam
     if (refinedRes <= res) return refinedRes;
 
     // This can happen if the quartic solver returned a very bad value, like an
-    //  unreastically huge alpha
+    //  unrealistically huge alpha
     x = x0;
   }
 

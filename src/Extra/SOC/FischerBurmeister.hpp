@@ -28,9 +28,9 @@ namespace bogus {
 //! Binary Fischer-Burmeister function and jacobian computation
 template <DenseIndexType Dimension, typename Scalar>
 struct FBBaseFunction {
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
-  typedef typename Traits::Vector Vector;
-  typedef typename Traits::Matrix Matrix;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
+  using Vector = typename Traits::Vector;
+  using Matrix = typename Traits::Matrix;
 
   //! Computation of the FB function on the cone of aperture \p mu
   static void compute(const Scalar mu, const Vector& x, const Vector& y, Vector& fb);
@@ -54,10 +54,10 @@ struct FBBaseFunction {
 template <DenseIndexType Dimension, typename Scalar, bool DeSaxceCOV>
 class FischerBurmeister {
  public:
-  typedef LocalProblemTraits<Dimension, Scalar> Traits;
-  typedef FBBaseFunction<Dimension, Scalar> BaseFunction;
-  typedef typename Traits::Vector Vector;
-  typedef typename Traits::Matrix Matrix;
+  using Traits = LocalProblemTraits<Dimension, Scalar>;
+  using BaseFunction = FBBaseFunction<Dimension, Scalar>;
+  using Vector = typename Traits::Vector;
+  using Matrix = typename Traits::Matrix;
 
   //! Constructs an object modeling the function \f$ f : x \mapsto FB \left( mu, scaling \times x, A x + b \right) \f$
   FischerBurmeister(const Scalar mu, const Matrix& A, const Vector& b, const Scalar scaling)

@@ -39,7 +39,7 @@ bool SOCLaw<Dimension, Scalar, DeSaxceCOV, Strat>::solveLocal(const unsigned pro
                                                               const typename Traits::Matrix &A,
                                                               const typename Traits::Vector &b,
                                                               typename Traits::Vector &xm, const Scalar scaling) const {
-  typedef LocalSOCSolver<Traits::dimension, typename Traits::Scalar, DeSaxceCOV, Strat> LocalSolver;
+  using LocalSolver = LocalSOCSolver<Traits::dimension, typename Traits::Scalar, DeSaxceCOV, Strat>;
   return m_localTol > LocalSolver::solve(A, b, xm, m_mu[problemIndex], m_localTol, scaling);
 }
 

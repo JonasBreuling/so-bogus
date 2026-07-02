@@ -19,6 +19,7 @@
 */
 
 #include <iosfwd>
+#include <memory>
 
 #include "../Core/Utils/Signal.hpp"
 #include "../Core/Utils/Timer.hpp"
@@ -96,13 +97,13 @@ class MecheFrictionProblem {
                                  //!< d*ndof[ObjA[i]] </c> corresponding to the H-matrix of <c> ObjA[i] </c>
       const double *const
           HB[]  //!< array of size \a n, containing pointers to a dense, colum-major matrix of size <c> d*ndof[ObjA[i]]
-                //!< </c> corresponding to the H-matrix of <c> ObjB[i] </c> (\c NULL for an external object)
+                //!< </c> corresponding to the H-matrix of <c> ObjB[i] </c> (\c nullptr for an external object)
   );
 
   //! Solves the friction problem
   double solve(
       double *r,  //!< length \a nd : initialization for \a r (in world space coordinates) + used to return computed r
-      double *v,  //!< length \a m: to return computed v ( or NULL if not needed )
+      double *v,  //!< length \a m: to return computed v ( or nullptr if not needed )
       const Options &options,  //!< Solver options
       bool staticProblem =
           false,  //!< If true, do not use DeSaxce change of variable, ie solve SOCQP -- useful for statics
@@ -112,7 +113,7 @@ class MecheFrictionProblem {
   //! Solves the friction problem (\deprecated interface)
   double solve(
       double *r,  //!< length \a nd : initialization for \a r (in world space coordinates) + used to return computed r
-      double *v,  //!< length \a m: to return computed v ( or NULL if not needed )
+      double *v,  //!< length \a m: to return computed v ( or nullptr if not needed )
       int maxThreads = 0,  //!< Maximum number of threads that the GS will use. If 0, use OpenMP default. If > 1, enable
                            //!< coloring to ensure deterministicity
       double tol = 0.,     //!< Gauss-Seidel tolerance. 0. means GS's default
@@ -130,23 +131,23 @@ class MecheFrictionProblem {
   //! Computes the dual from the primal
   void computeDual(double regularization);
 
-  //! Cleams up the problem, then allocates a new PrimalFrictionProblem and make m_primal point to it
+  //! Cleans up the problem, then allocates a new PrimalFrictionProblem and make m_primal point to it
   void reset();
 
   unsigned nDegreesOfFreedom() const;
   unsigned nContacts() const;
 
-  //! Sets the standard output stream ( \p out can be NULL to remove all output )
+  //! Sets the standard output stream ( \p out can be nullptr to remove all output )
   void setOutStream(std::ostream *out);
 
   //! Signal< interationNumber, error, elapsedTime > that will be triggered every few iterations
   Signal<unsigned, double, double> &callback() { return m_callback; }
 
   //! Dumps the current primal() to \p fileName
-  /*! \param r0 The initial guess that shouls be saved with the problem, or NULL */
+  /*! \param r0 The initial guess that should be saved with the problem, or nullptr */
   bool dumpToFile(const char *fileName, const double *r0 = nullptr) const;
   //! Loads the primal from a previously saved problem file
-  /*! \param r0 Will be set to ploint to a newly allocated array containing the initial
+  /*! \param r0 Will be set to point to a newly allocated array containing the initial
           guess, if such one was saved with the problem. Will have to be manually freed
           by the caller using the delete[] operator.
           \param old If true, use the old (<1.4) version of the serialization file
@@ -164,9 +165,9 @@ class MecheFrictionProblem {
   PrimalFrictionProblem<3u> &primal() { return *m_primal; }
   DualFrictionProblem<3u> &dual() { return *m_dual; }
 
-  double *f() { return m_f; }
-  double *w() { return m_w; }
-  double *mu() { return m_mu; }
+  double *f() { return m_f.get(); }
+  double *w() { return m_w.get(); }
+  double *mu() { return m_mu.get(); }
 
   //! Time spent in last solver call. In seconds.
   double lastSolveTime() const { return m_lastSolveTime; }
@@ -174,8 +175,8 @@ class MecheFrictionProblem {
  protected:
   void destroy();
 
-  PrimalFrictionProblem<3u> *m_primal;
-  DualFrictionProblem<3u> *m_dual;
+  std::unique_ptr<PrimalFrictionProblem<3u>> m_primal;
+  std::unique_ptr<DualFrictionProblem<3u>> m_dual;
 
   double m_lastSolveTime;
 
@@ -184,13 +185,13 @@ class MecheFrictionProblem {
 
  private:
   // Non copyable, non assignable
-  MecheFrictionProblem(const MecheFrictionProblem &);
-  MecheFrictionProblem &operator=(const MecheFrictionProblem &);
+  MecheFrictionProblem(const MecheFrictionProblem &) = delete;
+  MecheFrictionProblem &operator=(const MecheFrictionProblem &) = delete;
 
   // Used to store data when loading problem from file
-  double *m_f;
-  double *m_w;
-  double *m_mu;
+  std::unique_ptr<double[]> m_f;
+  std::unique_ptr<double[]> m_w;
+  std::unique_ptr<double[]> m_mu;
 
   std::ostream *m_out;
 };

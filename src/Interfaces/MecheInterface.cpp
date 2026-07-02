@@ -73,16 +73,11 @@ MecheFrictionProblem::MecheFrictionProblem()
 MecheFrictionProblem::~MecheFrictionProblem() { destroy(); }
 
 void MecheFrictionProblem::destroy() {
-  delete[] m_f;
-  m_f = nullptr;
-  delete[] m_w;
-  m_w = nullptr;
-  delete[] m_mu;
-  m_mu = nullptr;
-  delete m_primal;
-  m_primal = nullptr;
-  delete m_dual;
-  m_dual = nullptr;
+  m_f.reset();
+  m_w.reset();
+  m_mu.reset();
+  m_primal.reset();
+  m_dual.reset();
 }
 
 void MecheFrictionProblem::ackCurrentResidual(unsigned GSIter, double err) {
@@ -95,7 +90,7 @@ void MecheFrictionProblem::ackCurrentResidual(unsigned GSIter, double err) {
 void MecheFrictionProblem::reset() {
   destroy();
 
-  m_primal = new PrimalFrictionProblem<3u>();
+  m_primal = std::make_unique<PrimalFrictionProblem<3u>>();
   m_lastSolveTime = 0;
 }
 
@@ -121,7 +116,7 @@ void MecheFrictionProblem::fromPrimal(
                                //!< d*ndof[ObjA[i]] </c> corresponding to the H-matrix of <c> ObjA[i] </c>
     const double *const
         HB[]  //!< array of size \a n, containing pointers to a dense, colum-major matrix of size <c> d*ndof[ObjA[i]]
-              //!< </c> corresponding to the H-matrix of <c> ObjB[i] </c> (\c NULL for an external object)
+              //!< </c> corresponding to the H-matrix of <c> ObjB[i] </c> (\c nullptr for an external object)
 ) {
   reset();
 
@@ -139,7 +134,7 @@ void MecheFrictionProblem::fromPrimal(
   m_primal->M.finalize();
 
   // E
-  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 3> > E_flat(E_in, 3 * n_in, 3);
+  Eigen::Map<const Eigen::Matrix<double, Eigen::Dynamic, 3>> E_flat(E_in, 3 * n_in, 3);
 
   m_primal->E.reserve(n_in);
   m_primal->E.setRows(n_in);
@@ -196,8 +191,7 @@ unsigned MecheFrictionProblem::nDegreesOfFreedom() const { return m_primal ? m_p
 unsigned MecheFrictionProblem::nContacts() const { return m_primal ? m_primal->H.rowsOfBlocks() : 0u; }
 
 void MecheFrictionProblem::computeDual(double regularization) {
-  delete m_dual;
-  m_dual = new DualFrictionProblem<3u>();
+  m_dual = std::make_unique<DualFrictionProblem<3u>>();
   m_dual->computeFrom(*m_primal);
 
   if (regularization > 0.) {
@@ -389,9 +383,8 @@ bool MecheFrictionProblem::dumpToFile(const char *fileName, const double *r0) co
     oa << boost::serialization::make_array(m_primal->f, nDegreesOfFreedom());
     oa << boost::serialization::make_array(m_primal->w, 3 * nContacts());
     oa << boost::serialization::make_array(m_primal->mu, nContacts());
-    bool has_r0 = r0 != 0;
+    bool has_r0 = r0 != nullptr;
     oa << has_r0;
-    ;
     if (r0) {
       oa << boost::serialization::make_array(r0, 3 * nContacts());
     }
@@ -427,18 +420,18 @@ bool MecheFrictionProblem::fromFile(const char *fileName, double *&r0, bool old)
     return false;
   }
 
-  m_f = new double[nDegreesOfFreedom()];
-  m_w = new double[3 * nContacts()];
-  m_mu = new double[nContacts()];
+  m_f = std::make_unique<double[]>(nDegreesOfFreedom());
+  m_w = std::make_unique<double[]>(3 * nContacts());
+  m_mu = std::make_unique<double[]>(nContacts());
 
   r0 = new double[3 * nContacts()];
 
   std::cout << fileName << ": " << nDegreesOfFreedom() << " dofs, " << nContacts() << " contacts" << std::endl;
 
   try {
-    ia >> boost::serialization::make_array(m_f, nDegreesOfFreedom());
-    ia >> boost::serialization::make_array(m_w, 3 * nContacts());
-    ia >> boost::serialization::make_array(m_mu, nContacts());
+    ia >> boost::serialization::make_array(m_f.get(), nDegreesOfFreedom());
+    ia >> boost::serialization::make_array(m_w.get(), 3 * nContacts());
+    ia >> boost::serialization::make_array(m_mu.get(), nContacts());
 
     bool has_r0;
     ia >> has_r0;
@@ -450,17 +443,17 @@ bool MecheFrictionProblem::fromFile(const char *fileName, double *&r0, bool old)
 
   } catch (std::exception &e) {
     std::cerr << "Error reading MecheFrictionProblem from " << fileName << ":\n> " << e.what() << std::endl;
-    delete m_f;
-    delete m_w;
-    delete m_mu;
-    delete r0;
-    r0 = m_f = m_w = m_mu = nullptr;
+    m_f.reset();
+    m_w.reset();
+    m_mu.reset();
+    delete[] r0;
+    r0 = nullptr;
     return false;
   }
 
-  m_primal->f = m_f;
-  m_primal->w = m_w;
-  m_primal->mu = m_mu;
+  m_primal->f = m_f.get();
+  m_primal->w = m_w.get();
+  m_primal->mu = m_mu.get();
 
   m_primal->computeMInv();
 

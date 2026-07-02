@@ -56,14 +56,14 @@ template <unsigned Dimension>
 struct PrimalFrictionProblem {
   // Primal Data
 
-  typedef SparseBlockMatrix<Eigen::MatrixXd> MType;
+  using MType = SparseBlockMatrix<Eigen::MatrixXd>;
   //! M -- mass matrix
   MType M;
   //! E -- local rotation matrix ( contact basis coordinates to world coordinates )
   bogus::SparseBlockMatrix<Eigen::Matrix<double, Dimension, Dimension> > E;
 
-  typedef Eigen::Matrix<double, Dimension, Eigen::Dynamic> HBlock;
-  typedef FlatSparseBlockMatrix<HBlock, UNCOMPRESSED> HType;
+  using HBlock = Eigen::Matrix<double, Dimension, Eigen::Dynamic>;
+  using HType = FlatSparseBlockMatrix<HBlock, UNCOMPRESSED>;
   //! H -- deformation gradient \f$ \frac{\partial u}{\partial v} \f$ ( generalized coordinates <-> contact basis
   //! coordinates )
   HType H;
@@ -78,7 +78,7 @@ struct PrimalFrictionProblem {
   // Cached data
 
   //! M^-1
-  typedef SparseBlockMatrix<LU<Eigen::MatrixBase<Eigen::MatrixXd> > > MInvType;
+  using MInvType = SparseBlockMatrix<LU<Eigen::MatrixBase<Eigen::MatrixXd> > >;
   MInvType MInv;
 
   //! Computes MInv from M. Required to build a DualFrictionProblem for the PrimalFrictionProblem,
@@ -87,9 +87,9 @@ struct PrimalFrictionProblem {
 
   // Primal-dual solve functions
 
-  typedef ADMM<HType> ADMMType;
-  typedef DualAMA<HType> DualAMAType;
-  typedef ProductGaussSeidel<HType, MInvType, true> ProductGaussSeidelType;
+  using ADMMType = ADMM<HType>;
+  using DualAMAType = DualAMA<HType>;
+  using ProductGaussSeidelType = ProductGaussSeidel<HType, MInvType, true>;
 
   //! Matrix-free Gauss-Seidel solver
   /*! \note Requires the computation of a factorization of M with computeMInv()
@@ -121,20 +121,20 @@ struct PrimalFrictionProblem {
   where \p W is a symmetric, positive semi-definite matrix with \f$ d \times d \f$ blocks,
   \p u are the relative velocities and \p r are the contact forces.
   May be constructed from a PrimalFrictionProblem, or by directly initializing each data member
-  to accomodate problems with different mass matrix structures.
+  to accommodate problems with different mass matrix structures.
   See also \ref block_solvers_ns .
 */
 template <unsigned Dimension>
 struct DualFrictionProblem {
-  typedef SparseBlockMatrix<Eigen::Matrix<double, Dimension, Dimension, Eigen::RowMajor>, SYMMETRIC> WType;
+  using WType = SparseBlockMatrix<Eigen::Matrix<double, Dimension, Dimension, Eigen::RowMajor>, SYMMETRIC>;
 
-  typedef GaussSeidel<WType> GaussSeidelType;
-  typedef ProjectedGradient<WType> ProjectedGradientType;
+  using GaussSeidelType = GaussSeidel<WType>;
+  using ProjectedGradientType = ProjectedGradient<WType>;
 
-  typedef SOCLaw<Dimension, double, true> CoulombLawType;
-  typedef SOCLaw<Dimension, double, false> SOCLawType;
+  using CoulombLawType = SOCLaw<Dimension, double, true>;
+  using SOCLawType = SOCLaw<Dimension, double, false>;
 
-  typedef Signal<unsigned, double> SignalType;
+  using SignalType = Signal<unsigned, double>;
 
   //! W -- Delassus operator
   WType W;
@@ -158,7 +158,7 @@ struct DualFrictionProblem {
     */
   double solveWith(GaussSeidelType &gs, double *r, const bool staticProblem = false) const;
   //! Same as above
-  /*! \warning staticProblem defaults tp true (as solving Coulomb probles with PG is unreliable)*/
+  /*! \warning staticProblem defaults to true (as solving Coulomb problems with PG is unreliable)*/
   double solveWith(ProjectedGradientType &pg, double *r, const bool staticProblem = true) const;
 
   //! Evaluate a residual using the GS's error function
@@ -171,7 +171,7 @@ struct DualFrictionProblem {
     */
   double evalWith(const GaussSeidelType &gs, const double *r, const bool staticProblem = false) const;
   //! Same as above
-  /*! \warning staticProblem defaults tp true (as solving Coulomb probles with PG is unreliable)*/
+  /*! \warning staticProblem defaults to true (as solving Coulomb problems with PG is unreliable)*/
   double evalWith(const ProjectedGradientType &gs, const double *r, const bool staticProblem = true) const;
 
   //! Solves this problem using the Cadoux algorithm ( with fixed-point iteration )
@@ -180,8 +180,8 @@ struct DualFrictionProblem {
     \param gs The GaussSeidel< WType > solver to use
     \param r  Both the initial guess and the result
     \param fpIterations Number of fixed-point iterations
-    \param callback 0, or a pointer to a user-defined function that takes ( unsigned iteration, double residual ) as
-    arguments \returns the error as returned by the GaussSeidel::solve() function
+    \param callback nullptr, or a pointer to a user-defined function that takes ( unsigned iteration, double residual )
+    as arguments \returns the error as returned by the GaussSeidel::solve() function
     */
   double solveCadoux(GaussSeidelType &gs, double *r, const unsigned fpIterations,
                      const SignalType *callback = nullptr) const;
@@ -198,7 +198,7 @@ struct DualFrictionProblem {
   /*!
    Useful for achieving better memory locality when using the Coloring functionality
    of the GaussSeidel algorithm. \sa Coloring
-   * \warning To use the permutation releated functions, all the blocks have to have the same size
+   * \warning To use the permutation related functions, all the blocks have to have the same size
   */
   void applyPermutation(const std::vector<std::size_t> &permutation);
   void undoPermutation();

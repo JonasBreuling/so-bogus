@@ -37,9 +37,9 @@ namespace bogus {
           \param minimizer The minimizer to use for each inner SOCQP problem
           \param r  Both the initial guess and the result
           \param cadouxIterations Number of fixed-point iterations
-          \param callback NULL, or a pointer to a user-defined function that takes ( unsigned iteration, double residual
-   ) as arguments \param tolTighten How much should the tolerance of the inner solver be tightened \returns the error as
-   returned by the minimizer eval() function
+          \param callback nullptr, or a pointer to a user-defined function that takes ( unsigned iteration, double
+   residual ) as arguments \param tolTighten How much should the tolerance of the inner solver be tightened \returns the
+   error as returned by the minimizer eval() function
           */
 template <unsigned Dimension, typename WType, typename Method, typename MatrixT>
 static typename WType::Scalar solveCadoux(const WType& W, const typename WType::Scalar* b,
@@ -50,7 +50,7 @@ static typename WType::Scalar solveCadoux(const WType& W, const typename WType::
                                           const typename WType::Scalar tolTighten = 1.e-1) {
   // We might experience slow convergence is inner solve not precise enough
 
-  typedef typename WType::Scalar Scalar;
+  using Scalar = typename WType::Scalar;
   const std::ptrdiff_t n = W.rowsOfBlocks();
 
   SOCLaw<Dimension, Scalar, true> coulombLaw(n, mu);
@@ -102,7 +102,7 @@ static double solveCadouxVel(const WType& W, const typename WType::Scalar* b, co
   // u* = u + s n
   // Wu* + b - W(s n) = r
 
-  typedef typename WType::Scalar Scalar;
+  using Scalar = typename WType::Scalar;
   const std::ptrdiff_t n = W.rowsOfBlocks();
 
   SOCLaw<Dimension, Scalar, false> socLaw(n, mu);

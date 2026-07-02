@@ -17,13 +17,13 @@ namespace bogus {
 
 template <typename Scalar_>
 struct ProblemTraits {
-  typedef Scalar_ Scalar;
+  using Scalar = Scalar_;
 
-  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, 1> DynVector;
-  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> DynMatrix;
+  using DynVector = Eigen::Matrix<Scalar, Eigen::Dynamic, 1>;
+  using DynMatrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
   template <typename OtherMatrix>
   struct MutableClone {
-    typedef Eigen::Matrix<Scalar, OtherMatrix::RowsAtCompileTime, OtherMatrix::ColsAtCompileTime> Type;
+    using Type = Eigen::Matrix<Scalar, OtherMatrix::RowsAtCompileTime, OtherMatrix::ColsAtCompileTime>;
   };
 };
 
@@ -31,15 +31,15 @@ template <DenseIndexType Dimension, typename Scalar_>
 struct LocalProblemTraits : public ProblemTraits<Scalar_> {
   enum { dimension = Dimension };
 
-  typedef Scalar_ Scalar;
-  typedef Eigen::Matrix<Scalar, Dimension, 1> Vector;
-  typedef Eigen::Array<Scalar, Dimension, 1> Array;
-  typedef Eigen::Matrix<Scalar, Dimension, Dimension> Matrix;
+  using Scalar = Scalar_;
+  using Vector = Eigen::Matrix<Scalar, Dimension, 1>;
+  using Array = Eigen::Array<Scalar, Dimension, 1>;
+  using Matrix = Eigen::Matrix<Scalar, Dimension, Dimension>;
 
-  typedef typename MatrixTraits<Matrix>::LUType LUType;
-  typedef typename MatrixTraits<Matrix>::LDLTType LDLTType;
+  using LUType = typename MatrixTraits<Matrix>::LUType;
+  using LDLTType = typename MatrixTraits<Matrix>::LDLTType;
 
-  typedef Eigen::Matrix<Scalar, Dimension - 1, Dimension - 1> TgMatrix;
+  using TgMatrix = Eigen::Matrix<Scalar, Dimension - 1, Dimension - 1>;
 
   static Scalar np(const Vector& v) { return v[0]; }
   static Scalar& np(Vector& v) { return v[0]; }
@@ -67,13 +67,13 @@ struct LocalProblemTraits : public ProblemTraits<Scalar_> {
 template <typename Scalar>
 struct LocalProblemTraits<Eigen::Dynamic, Scalar>
     : public ProblemTraits<Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> > {
-  typedef Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> Matrix;
-  typedef ProblemTraits<Matrix> Base;
+  using Matrix = Eigen::Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic>;
+  using Base = ProblemTraits<Matrix>;
 
   enum { dimension = internal::DYNAMIC };
 
-  typedef typename Base::DynVector Vector;
-  typedef typename Base::DynMatrix TgMatrix;
+  using Vector = typename Base::DynVector;
+  using TgMatrix = typename Base::DynMatrix;
 
   static Scalar np(const Vector& v) { return v[0]; }
   static Scalar& np(Vector& v) { return v[0]; }

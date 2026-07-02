@@ -25,9 +25,9 @@ namespace bogus {
 template <typename EigenDerived, typename BogusDerived>
 void convert(const Eigen::SparseMatrixBase<EigenDerived>& source, SparseBlockMatrixBase<BogusDerived>& dest,
              int destRowsPerBlock = 0, int destColsPerBlock = 0) {
-  typedef BlockMatrixTraits<BogusDerived> Traits;
-  typedef typename Traits::Index Index;
-  typedef typename Traits::BlockPtr BlockPtr;
+  using Traits = BlockMatrixTraits<BogusDerived>;
+  using Index = typename Traits::Index;
+  using BlockPtr = typename Traits::BlockPtr;
 
   const Index RowsPerBlock = destRowsPerBlock ? (Index)destRowsPerBlock : (Index)Traits::RowsPerBlock;
   const Index ColsPerBlock = destColsPerBlock ? (Index)destColsPerBlock : (Index)Traits::ColsPerBlock;
@@ -61,9 +61,9 @@ void convert(const Eigen::SparseMatrixBase<EigenDerived>& source, SparseBlockMat
     }
 
     // II - Insert them in block mat
-    for (typename std::map<Index, BlockPtr>::iterator bIt = nzBlocks.begin(); bIt != nzBlocks.end(); ++bIt) {
-      bIt->second = (BlockPtr)dest.nBlocks();
-      typename BogusDerived::BlockRef block = dest.template insertByOuterInner<true>(outer, bIt->first);
+    for (auto& [blockId, ptr] : nzBlocks) {
+      ptr = (BlockPtr)dest.nBlocks();
+      typename BogusDerived::BlockRef block = dest.template insertByOuterInner<true>(outer, blockId);
       resize(block, RowsPerBlock, ColsPerBlock);
       block.setZero();
     }
@@ -83,7 +83,7 @@ void convert(const Eigen::SparseMatrixBase<EigenDerived>& source, SparseBlockMat
 
     // IV - Symmetrify diagonal block if required
     if (Traits::is_symmetric) {
-      typename std::map<Index, BlockPtr>::const_iterator diagPtr = nzBlocks.find(outer);
+      const auto diagPtr = nzBlocks.find(outer);
       if (diagPtr != nzBlocks.end()) {
         const typename Traits::BlockType diagBlock = dest.block(diagPtr->second);
         dest.block(diagPtr->second) = .5 * (diagBlock + TransposeIf<Traits::is_symmetric>::get(diagBlock));
@@ -97,14 +97,14 @@ void convert(const Eigen::SparseMatrixBase<EigenDerived>& source, SparseBlockMat
 template <typename BogusDerived, typename EigenScalar, int EigenOptions, typename EigenIndex>
 void convert(const SparseBlockMatrixBase<BogusDerived>& source,
              Eigen::SparseMatrix<EigenScalar, EigenOptions, EigenIndex>& dest) {
-  typedef BlockMatrixTraits<BogusDerived> Traits;
-  typedef typename Traits::Index Index;
+  using Traits = BlockMatrixTraits<BogusDerived>;
+  using Index = typename Traits::Index;
 
-  typedef Eigen::SparseMatrix<EigenScalar, EigenOptions, EigenIndex> EigenMatrixType;
+  using EigenMatrixType = Eigen::SparseMatrix<EigenScalar, EigenOptions, EigenIndex>;
 
-  typedef SparseBlockIndexGetter<BogusDerived, Traits::is_symmetric ||
-                                                   ((bool)EigenMatrixType::IsRowMajor) != ((bool)Traits::is_col_major)>
-      IndexGetter;
+  using IndexGetter =
+      SparseBlockIndexGetter<BogusDerived, Traits::is_symmetric ||
+                                               ((bool)EigenMatrixType::IsRowMajor) != ((bool)Traits::is_col_major)>;
 
   dest.setZero();
   dest.resize(source.rows(), source.cols());

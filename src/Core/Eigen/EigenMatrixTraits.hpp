@@ -22,22 +22,22 @@ namespace bogus {
 
 template <typename _MatrixType>
 struct MatrixTraits {
-  typedef _MatrixType MatrixType;
-  typedef typename MatrixType::Scalar Scalar;
+  using MatrixType = _MatrixType;
+  using Scalar = typename MatrixType::Scalar;
 
-  typedef LU<Eigen::MatrixBase<MatrixType> > LUType;
-  typedef LDLT<Eigen::MatrixBase<MatrixType> > LDLTType;
+  using LUType = LU<Eigen::MatrixBase<MatrixType> >;
+  using LDLTType = LDLT<Eigen::MatrixBase<MatrixType> >;
 
   static const MatrixType& asConstMatrix(const MatrixType& src) { return src; }
 };
 
 template <typename _Scalar, int _Options, typename _Index>
 struct MatrixTraits<Eigen::SparseMatrix<_Scalar, _Options, _Index> > {
-  typedef _Scalar Scalar;
-  typedef Eigen::SparseMatrix<Scalar, _Options, _Index> MatrixType;
+  using Scalar = _Scalar;
+  using MatrixType = Eigen::SparseMatrix<Scalar, _Options, _Index>;
 
-  typedef LU<Eigen::SparseMatrixBase<Eigen::SparseMatrix<Scalar, _Options, _Index> > > LUType;
-  typedef LDLT<Eigen::SparseMatrixBase<Eigen::SparseMatrix<Scalar, _Options, _Index> > > LDLTType;
+  using LUType = LU<Eigen::SparseMatrixBase<Eigen::SparseMatrix<Scalar, _Options, _Index> > >;
+  using LDLTType = LDLT<Eigen::SparseMatrixBase<Eigen::SparseMatrix<Scalar, _Options, _Index> > >;
 
   static const MatrixType& asConstMatrix(const MatrixType& src) { return src; }
 };

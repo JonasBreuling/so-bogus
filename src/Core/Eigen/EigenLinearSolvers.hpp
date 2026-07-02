@@ -8,8 +8,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-#ifndef BOGUS_EIGEN_LINEAR_SOLVERS
-#define BOGUS_EIGEN_LINEAR_SOLVERS
+#ifndef BOGUS_EIGEN_LINEAR_SOLVERS_HPP
+#define BOGUS_EIGEN_LINEAR_SOLVERS_HPP
 
 #include "../Utils/LinearSolverBase.hpp"
 
@@ -20,23 +20,23 @@ namespace bogus {
 
 template <typename Derived>
 struct LinearSolverTraits<LU<Eigen::MatrixBase<Derived> > > {
-  typedef typename Derived::PlainObject MatrixType;
-  typedef Eigen::FullPivLU<MatrixType> FactType;
+  using MatrixType = typename Derived::PlainObject;
+  using FactType = Eigen::FullPivLU<MatrixType>;
 
   template <typename RhsT>
   struct Result {
-    typedef const Eigen::Solve<FactType, RhsT> Type;
+    using Type = const Eigen::Solve<FactType, RhsT>;
   };
   template <typename RhsT>
   struct Result<Eigen::MatrixBase<RhsT> > {
-    typedef typename Result<RhsT>::Type Type;
+    using Type = typename Result<RhsT>::Type;
   };
 };
 
 template <typename Derived>
 struct LU<Eigen::MatrixBase<Derived> > : public LinearSolverBase<LU<Eigen::MatrixBase<Derived> > > {
-  typedef Eigen::MatrixBase<Derived> MatrixType;
-  typedef LinearSolverTraits<LU<MatrixType> > Traits;
+  using MatrixType = Eigen::MatrixBase<Derived>;
+  using Traits = LinearSolverTraits<LU<MatrixType> >;
 
   LU() {}
   template <typename OtherDerived>
@@ -72,23 +72,23 @@ struct DenseLU : public LU<Eigen::MatrixBase<Eigen::Matrix<Scalar, Rows, Cols, O
 
 template <typename Derived>
 struct LinearSolverTraits<LDLT<Eigen::MatrixBase<Derived> > > {
-  typedef typename Derived::PlainObject MatrixType;
-  typedef Eigen::LDLT<MatrixType> FactType;
+  using MatrixType = typename Derived::PlainObject;
+  using FactType = Eigen::LDLT<MatrixType>;
 
   template <typename RhsT>
   struct Result {
-    typedef const Eigen::Solve<FactType, RhsT> Type;
+    using Type = const Eigen::Solve<FactType, RhsT>;
   };
   template <typename RhsT>
   struct Result<Eigen::MatrixBase<RhsT> > {
-    typedef typename Result<RhsT>::Type Type;
+    using Type = typename Result<RhsT>::Type;
   };
 };
 
 template <typename Derived>
 struct LDLT<Eigen::MatrixBase<Derived> > : public LinearSolverBase<LDLT<Eigen::MatrixBase<Derived> > > {
-  typedef Eigen::MatrixBase<Derived> MatrixType;
-  typedef LinearSolverTraits<LDLT<MatrixType> > Traits;
+  using MatrixType = Eigen::MatrixBase<Derived>;
+  using Traits = LinearSolverTraits<LDLT<MatrixType> >;
 
   LDLT() {}
   template <typename OtherDerived>

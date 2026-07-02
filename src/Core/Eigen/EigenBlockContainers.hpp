@@ -19,7 +19,7 @@ namespace bogus {
 // We do not have to use the specialized allocator if the size is dynamic or not a multiple of 16 bytes
 template <typename Scalar, int Rows, int Cols, int Options, int MaxRows, int MaxCols>
 struct ResizableSequenceContainer<Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>> {
-  typedef Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols> BlockType;
+  using BlockType = Eigen::Matrix<Scalar, Rows, Cols, Options, MaxRows, MaxCols>;
 
   static constexpr bool UseAlignedAllocator = !(Rows == Eigen::Dynamic || Cols == Eigen::Dynamic ||
                                                 ((static_cast<std::size_t>(Rows * Cols * sizeof(Scalar)) & 0xf) != 0));

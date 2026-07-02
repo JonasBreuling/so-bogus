@@ -18,7 +18,7 @@ TEST_F(SmallFrictionPb, ProjectedGradient) {
 
   Eigen::VectorXd b = w - H * (InvMassMat * f);
 
-  typedef bogus::SparseBlockMatrix<Eigen::Matrix3d, bogus::flags::SYMMETRIC> WType;
+  using WType = bogus::SparseBlockMatrix<Eigen::Matrix3d, bogus::flags::SYMMETRIC>;
   WType W;
   W = H * InvMassMat * H.transpose();
 
@@ -69,7 +69,7 @@ TEST_F(SmallFrictionPb, MatrixFreeProjectedGradient) {
   double res = -1;
 
   // Without assembling W
-  typedef bogus::Product<bogus::Product<HType, MType>, bogus::Transpose<HType> > Prod;
+  using Prod = bogus::Product<bogus::Product<HType, MType>, bogus::Transpose<HType> >;
   Prod prod = H * InvMassMat * H.transpose();
 
   x.setOnes();

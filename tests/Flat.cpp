@@ -15,7 +15,7 @@
 
 class FlatSBM : public ::testing::Test {
  protected:
-  virtual void SetUp() {
+  void SetUp() override {
     // Eigen::initParallel()
     Eigen::MatrixXf A = Eigen::MatrixXf::Zero(1, 1);
     A = A * A;
@@ -46,8 +46,8 @@ class FlatSBM : public ::testing::Test {
     ASSERT_EQ(sbm.InvalidBlockPtr, sbm.blockPtr(1, 1));
   }
 
-  typedef Eigen::MatrixXd BlockT;
-  typedef bogus::FlatSparseBlockMatrix<BlockT> SBMT;
+  using BlockT = Eigen::MatrixXd;
+  using SBMT = bogus::FlatSparseBlockMatrix<BlockT>;
   SBMT sbm;
   Eigen::VectorXd rhs;
 

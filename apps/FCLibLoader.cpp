@@ -40,7 +40,7 @@ namespace fclib {
 template <unsigned Dim>
 static double merit1(const Eigen::VectorXd& r, const Eigen::VectorXd& u, const Eigen::VectorXd& b, const double* mu) {
   const int n = r.rows() / Dim;
-  typedef SOCLaw<Dim, double, false> SOC;
+  using SOC = SOCLaw<Dim, double, false>;
   SOC socLaw(n, mu);
 
   double err = 0;
@@ -108,7 +108,7 @@ int main(int argc, const char* argv[]) {
           break;
         case 't':
           if (++i == argc) break;
-          options.tolerance = std::strtod(argv[i], NULL);
+          options.tolerance = std::strtod(argv[i], nullptr);
           break;
         case 'i':
           if (++i == argc) break;
@@ -124,7 +124,7 @@ int main(int argc, const char* argv[]) {
           break;
         case 'r':
           if (++i == argc) break;
-          options.gsRegularization = std::strtod(argv[i], NULL);
+          options.gsRegularization = std::strtod(argv[i], nullptr);
           break;
         case 'v':
           if (++i == argc) break;
@@ -144,9 +144,9 @@ int main(int argc, const char* argv[]) {
     return 1;
   }
 
-  struct fclib_local* problem = NULL;
-  struct fclib_solution* solution = NULL;
-  struct fclib_solution* guesses = NULL;
+  struct fclib_local* problem = nullptr;
+  struct fclib_solution* solution = nullptr;
+  struct fclib_solution* guesses = nullptr;
   int n_guesses = 0;
 
   problem = fclib_read_local(file);
@@ -209,10 +209,10 @@ int main(int argc, const char* argv[]) {
         std::cout << " => Time: \t" << stats.time << std::endl;
 
         fclib_solution sol;
-        sol.v = NULL;
+        sol.v = nullptr;
         sol.u = u.data();
         sol.r = r.data();
-        sol.l = NULL;
+        sol.l = nullptr;
 
         std::cout << " => .. FCLib Merit1: " << fclib_merit_local(problem, MERIT_1, &sol) << std::endl;
         std::cout << " => ..  True Merit1: " << res << std::endl;

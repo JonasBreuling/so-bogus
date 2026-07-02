@@ -59,7 +59,7 @@ int main(int argc, const char* argv[]) {
           break;
         case 't':
           if (++i == argc) break;
-          options.tolerance = std::strtod(argv[i], NULL);
+          options.tolerance = std::strtod(argv[i], nullptr);
           break;
         case 's':
           if (++i == argc) break;
@@ -79,7 +79,7 @@ int main(int argc, const char* argv[]) {
           break;
         case 'r':
           if (++i == argc) break;
-          problemRegularization = std::strtod(argv[i], NULL);
+          problemRegularization = std::strtod(argv[i], nullptr);
           break;
         case 'o':
           if (++i == argc) break;
@@ -87,11 +87,11 @@ int main(int argc, const char* argv[]) {
           break;
         case 'p':
           if (++i == argc) break;
-          options.admmProjStepSize = std::strtod(argv[i], NULL);
+          options.admmProjStepSize = std::strtod(argv[i], nullptr);
           break;
         case 'f':
           if (++i == argc) break;
-          options.admmFpStepSize = std::strtod(argv[i], NULL);
+          options.admmFpStepSize = std::strtod(argv[i], nullptr);
           break;
         case 'k':
           if (++i == argc) break;
@@ -124,7 +124,7 @@ int main(int argc, const char* argv[]) {
       problemRegularization = 0;
     }
 
-    const double res = mfp.solve(r, NULL, options, staticPb, problemRegularization);
+    const double res = mfp.solve(r, nullptr, options, staticPb, problemRegularization);
     std::cout << "Residual:\t " << res << std::endl;
     std::cout << "Solver timer:\t " << mfp.lastSolveTime() << " seconds" << std::endl;
 

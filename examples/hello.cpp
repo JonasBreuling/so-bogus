@@ -1,15 +1,11 @@
-// #include "../src/Core/Block.impl.hpp"
 #include "Core/Block.impl.hpp"
 #include "Core/Utils/Signal.hpp"
 
-#include "Core/Block.impl.hpp"
 #include "Core/BlockSolvers/GaussSeidel.impl.hpp"
 #include "Core/BlockSolvers/LCPLaw.impl.hpp"
 #include "Core/BlockSolvers/PyramidLaw.impl.hpp"
 
 #include "Extra/SecondOrder.impl.hpp"
-
-// #include "bogus/Core/Block.impl.hpp"
 #include <Extra/SOC/SOCLaw.impl.hpp>
 
 #include <Eigen/LU>
@@ -92,9 +88,9 @@ class SmallFrictionPb {
     sol << 0.0152695, 0.0073010, 0.0022325, 0.0, 0.0, 0.0;
   }
 
-  typedef bogus::SparseBlockMatrix<Eigen::MatrixXd, bogus::UNCOMPRESSED> MType;
-  typedef Eigen::Matrix<double, 3, Eigen::Dynamic> GradBlockT;
-  typedef bogus::SparseBlockMatrix<GradBlockT> HType;
+  using MType = bogus::SparseBlockMatrix<Eigen::MatrixXd, bogus::UNCOMPRESSED>;
+  using GradBlockT = Eigen::Matrix<double, 3, Eigen::Dynamic>;
+  using HType = bogus::SparseBlockMatrix<GradBlockT>;
 
   MType MassMat;
   MType InvMassMat;
@@ -110,7 +106,6 @@ class SmallFrictionPb {
   // virtual void TearDown() {}
 };
 
-// int main(int argc, char** argv) {
 int main(int, char**) {
   SmallFrictionPb prob;
 
@@ -119,7 +114,7 @@ int main(int, char**) {
 
     Eigen::VectorXd b = prob.w - prob.H * (prob.InvMassMat * prob.f);
 
-    typedef bogus::SparseBlockMatrix<Eigen::Matrix3d, bogus::flags::SYMMETRIC> WType;
+    using WType = bogus::SparseBlockMatrix<Eigen::Matrix3d, bogus::flags::SYMMETRIC>;
     WType W = prob.H * prob.InvMassMat * prob.H.transpose();
 
     Eigen::VectorXd x(W.rows());

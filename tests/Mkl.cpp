@@ -11,7 +11,7 @@
 #ifdef BOGUS_WITH_MKL
 
 TEST(Mkl, bsr_mv) {
-  typedef Eigen::Matrix<double, 3, 3, Eigen::RowMajor> BlockType;
+  using BlockType = Eigen::Matrix<double, 3, 3, Eigen::RowMajor>;
 
   Eigen::VectorXd expected_1(9), expected_2(9), expected_3(9);
   expected_1 << 9, 7, 5, 2, 4, 6, 9, 9, 9;

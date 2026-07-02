@@ -14,7 +14,7 @@
 #include <gtest/gtest.h>
 
 TEST(SparseBlock, MMult) {
-  typedef Eigen::Matrix<double, 3, 4> BlockT;
+  using BlockT = Eigen::Matrix<double, 3, 4>;
   BlockT sample;
   sample << 1, 2, 3, 4, 3, 2, 1, 0, 1, 2, 3, 4;
 
@@ -138,7 +138,7 @@ TEST(SparseBlock, Inv) {
 
   bogus::DenseLDLT<double, 2> ldlt(2 * Eigen::Matrix2d::Identity());
 
-  typedef bogus::LU<Eigen::MatrixBase<Eigen::MatrixXd> > BlockT;
+  using BlockT = bogus::LU<Eigen::MatrixBase<Eigen::MatrixXd> >;
   EXPECT_FALSE(bogus::IsTransposable<BlockT>::Value);
   bogus::SparseBlockMatrix<BlockT> isbm;
   isbm.setRows(2, 3);
@@ -160,7 +160,7 @@ TEST(SparseBlock, Sparse) {
   Eigen::VectorXd expected_2(6);
   expected_2 << 0.5, 1, 1.5, 1, 0.625, 6;
 
-  typedef Eigen::SparseMatrix<double> BlockT;
+  using BlockT = Eigen::SparseMatrix<double>;
   EXPECT_TRUE(bogus::IsTransposable<BlockT>::Value);
   bogus::SparseBlockMatrix<BlockT> sbm;
   sbm.reserve(10);
@@ -188,7 +188,7 @@ TEST(SparseBlock, Sparse) {
 
 #ifdef BOGUS_WITH_EIGEN_SPARSE_LDLT
   {
-    typedef bogus::SparseLDLT<double> InvBlockT;
+    using InvBlockT = bogus::SparseLDLT<double>;
     EXPECT_FALSE(bogus::IsTransposable<InvBlockT>::Value);
     bogus::SparseBlockMatrix<InvBlockT> isbm;
     isbm.cloneStructure(sbm);
@@ -206,7 +206,7 @@ TEST(SparseBlock, Sparse) {
 
 #ifdef BOGUS_WITH_EIGEN_SPARSE_LU
   {
-    typedef bogus::SparseLU<double> InvBlockT;
+    using InvBlockT = bogus::SparseLU<double>;
     EXPECT_FALSE(bogus::IsTransposable<InvBlockT>::Value);
     bogus::SparseBlockMatrix<InvBlockT> isbm;
     isbm.cloneStructure(sbm);
@@ -264,7 +264,7 @@ TEST(SparseBlock, Scalar) {
 }
 
 TEST(SparseBlock, Add) {
-  typedef Eigen::Matrix<double, 3, 4> BlockT;
+  using BlockT = Eigen::Matrix<double, 3, 4>;
   BlockT sample;
   sample << 1, 2, 3, 4, 3, 2, 1, 0, 1, 2, 3, 4;
 
@@ -368,7 +368,7 @@ TEST(SparseBlock, Add) {
   {
     const unsigned N = 3;
 
-    typedef bogus::SparseBlockMatrix<BlockT> SBM;
+    using SBM = bogus::SparseBlockMatrix<BlockT>;
     SBM sbm[3];
 
     for (unsigned i = 0; i < N; ++i) {
@@ -386,7 +386,7 @@ TEST(SparseBlock, Add) {
 
     Eigen::VectorXd res1(rhs1.rows());
 
-    typedef bogus::Product<SBM, bogus::Transpose<SBM> > Prod;
+    using Prod = bogus::Product<SBM, bogus::Transpose<SBM> >;
     bogus::NarySum<Prod> sum(sbm[0].rows(), sbm[0].rows());
 
     sum.multiply<false>(rhs1, res1, 1, 0);
@@ -412,7 +412,7 @@ TEST(SparseBlock, Add) {
 }
 
 TEST(SparseBlock, YoDawg) {
-  typedef bogus::SparseBlockMatrix<Eigen::Matrix3d> BlockType;
+  using BlockType = bogus::SparseBlockMatrix<Eigen::Matrix3d>;
   EXPECT_TRUE(bogus::IsTransposable<BlockType>::Value);
 
   bogus::SparseBlockMatrix<BlockType> sbm;
@@ -456,7 +456,7 @@ TEST(SparseBlock, YoDawg) {
   EXPECT_EQ(res1 + res2, sbm2 * rhs);
   EXPECT_EQ(sbm * res2, sbm3 * rhs);
 
-  typedef bogus::SparseBlockMatrix<BlockType, bogus::SYMMETRIC> SymSBM;
+  using SymSBM = bogus::SparseBlockMatrix<BlockType, bogus::SYMMETRIC>;
   ASSERT_TRUE((bogus::Addition<SymSBM, bogus::Transpose<SymSBM> >::is_self_transpose));
   ASSERT_FALSE((bogus::Product<SymSBM, bogus::Transpose<SymSBM> >::is_self_transpose));
 }

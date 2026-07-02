@@ -21,7 +21,7 @@ TEST(Krylov, CG) {
   const Eigen::Vector3d expected_1(.5, .5, .5);
   const Eigen::Vector3d expected_2(2, 1, 3);
 
-  typedef bogus::SparseBlockMatrix<Eigen::Matrix3d> Mat;
+  using Mat = bogus::SparseBlockMatrix<Eigen::Matrix3d>;
   Mat sbm;
   sbm.setRows(1, 3);
   sbm.setCols(1, 3);
@@ -87,12 +87,12 @@ TEST(Krylov, CG) {
 TEST(Krylov, Preconditioner) {
   ResidualInfo ri;
 
-  typedef Eigen::Matrix<double, 5, 5> Block;
+  using Block = Eigen::Matrix<double, 5, 5>;
   Block M_L;
   M_L << 1.72194, 0, 0, 0, 0, 0.027804, 1.78422, 0, 0, 0, 0.26607, 0.097189, 0, 0, 0, 0.96157, 0.71437, 0.98738,
       1.66828, 0, 0.024571, 0.046486, 0.94515, 0.38009, 1.087634;
 
-  typedef bogus::SparseBlockMatrix<Block> Mat;
+  using Mat = bogus::SparseBlockMatrix<Block>;
   Mat sbm;
   sbm.setRows(1, 5);
   sbm.setCols(1, 5);
@@ -177,8 +177,8 @@ TEST(Krylov, Preconditioner) {
   EXPECT_GT(1.e-16, (sbm * res - rhs).squaredNorm());
 
 #ifndef BOGUS_BLOCK_WITHOUT_EIGEN_SPARSE
-  typedef Eigen::SparseMatrix<double> SparseBlock;
-  typedef bogus::SparseBlockMatrix<SparseBlock> SparseMat;
+  using SparseBlock = Eigen::SparseMatrix<double>;
+  using SparseMat = bogus::SparseBlockMatrix<SparseBlock>;
   SparseMat ssbm;
   ssbm.cloneStructure(sbm);
   ssbm.block(0) = sbm.block(0).sparseView();
@@ -231,7 +231,7 @@ TEST(Krylov, Preconditioner) {
 TEST(Krylov, MultipleRhs) {
   ResidualInfo ri;
 
-  typedef Eigen::Matrix<double, 10, 10> Block;
+  using Block = Eigen::Matrix<double, 10, 10>;
   Block A;
   A << 1044, -167, -1016, -735, 329, -1278, -454, 1273, -963, -651, 631, -1409, 1633, 1989, -596, -493, -969, 92, 1949,
       939, -1842, 1161, -1341, 1407, -1720, -1099, 516, -1437, -1645, -492, 1741, 1069, 1011, -1593, -1096, -748, 1584,
@@ -271,8 +271,8 @@ TEST(Krylov, MultipleRhs) {
   EXPECT_GT(1.e-15, err);
   EXPECT_GT(1.e-15, (A * res - rhs).squaredNorm());
 
-  typedef bogus::krylov::solvers::GMRES<Block> GMRES;
-  typedef bogus::SparseBlockMatrix<GMRES> Mat;
+  using GMRES = bogus::krylov::solvers::GMRES<Block>;
+  using Mat = bogus::SparseBlockMatrix<GMRES>;
 
   Mat sbm;
   sbm.setRows(1, 10);
@@ -291,19 +291,19 @@ TEST(Krylov, MultipleRhs) {
 TEST(Krylov, ProductLhs) {
   ResidualInfo ri;
 
-  typedef Eigen::Matrix<double, 5, 5> Block;
+  using Block = Eigen::Matrix<double, 5, 5>;
   Block M_L;
   M_L << 1.72194, 0, 0, 0, 0, 0.027804, 1.78422, 0, 0, 0, 0.26607, 0.097189, 0, 0, 0, 0.96157, 0.71437, 0.98738,
       1.66828, 0, 0.024571, 0.046486, 0.94515, 0.38009, 1.087634;
 
-  typedef bogus::SparseBlockMatrix<Block> Mat;
+  using Mat = bogus::SparseBlockMatrix<Block>;
   Mat sbm;
   sbm.setRows(1, 5);
   sbm.setCols(1, 5);
   sbm.insertBack(0, 0) = .5 * (M_L + 2 * M_L.transpose());
   sbm.finalize();
 
-  typedef bogus::Product<Mat, bogus::Transpose<Mat> > Prod;
+  using Prod = bogus::Product<Mat, bogus::Transpose<Mat> >;
   Prod prod = sbm * sbm.transpose();
 
   Eigen::Matrix<double, 5, 1> rhs, res;

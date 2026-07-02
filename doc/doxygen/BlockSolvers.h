@@ -40,7 +40,7 @@ For the full list of available solvers, see the krylov::Method enum or the krylo
 Here is some code solving a very simple system without preconditioning:
 \code
   // Building a block matrix
-  typedef bogus::SparseBlockMatrix< Eigen::Matrix3d > Mat ;
+  using Mat = bogus::SparseBlockMatrix< Eigen::Matrix3d >;
   Mat sbm ;
   sbm.setRows( 1, 3 ) ;
   sbm.setCols( 1, 3 ) ;
@@ -72,8 +72,8 @@ If we wanted to use a preconditioner
 ... or sparse matrices
 
 \code
-  typedef Eigen::SparseMatrix< double > SparseBlock ;
-  typedef bogus::SparseBlockMatrix< SparseBlock > SparseMat ;
+  using SparseBlock = Eigen::SparseMatrix< double >;
+  using SparseMat = bogus::SparseBlockMatrix< SparseBlock >;
   SparseMat ssbm ;
   ssbm.cloneStructure( sbm ) ;
   ssbm.block(0) =  sbm.block(0).sparseView() ;
@@ -89,8 +89,8 @@ without explictely computing the system matrix. Suppose that we want to solve
 \f$ J J^T x = b \f$, this can be done as
 
 \code
-  typedef bogus::SparseBlockMatrix< BlockType > JType ;
-  typedef bogus::Product< JType, bogus::Transpose< JType > > Prod ; // Or use c++11 to infer the correct type
+  using JType = bogus::SparseBlockMatrix< BlockType >;
+  using Prod = bogus::Product< JType, bogus::Transpose< JType > >; // Or use c++11 to infer the correct type
   Prod W = J * J.transpose() ;
 
   bogus::Krylov< Prod >( W ).solve( b, x ) ;
@@ -103,14 +103,14 @@ more configuration options, such as setting the 'restart' option for the
 krylov::GMRES method.
 
 \code
-  typedef bogus::Krylov< Mat, bogus::DiagonalPreconditioner > KrylovType ;
+  using KrylovType = bogus::Krylov< Mat, bogus::DiagonalPreconditioner >;
   KrylovType krylov( sbm ) ;
 
   krylov.asGMRES().setRestart( 10 ).solve( rhs, res ) ;
 
   // Creating a SparseBlockMatrix of GMRES objects
 
-  typedef typename KrylovType::GMRESType GMRES ;
+  using GMRES = typename KrylovType::GMRESType;
 
   bogus::SparseBlockMatrix< GMRES > gmresMat ;
   // [..] Set rows, etc
@@ -173,7 +173,7 @@ Example code for 3D Coulomb friction (requires the \ref soc module):
 \code
 
 //Construct the dual matrix
-typedef bogus::SparseBlockMatrix< Eigen::Matrix3d, bogus::SYMMETRIC > WType ;
+using WType = bogus::SparseBlockMatrix< Eigen::Matrix3d, bogus::SYMMETRIC >;
 WType W = primal.H * ( primal.MInv * primal.H.transpose() ) ;
 
 //Friction coefficients
@@ -229,8 +229,8 @@ res = pg.solve< bogus::projected_gradient::APGD >( bogus::SOC3D( n, mu ), b, x )
 
 Once again, this algorithm can be used in a matrix-free fashion
 \code
-  typedef bogus::SparseBlockMatrix< BlockType > JType ;
-  typedef bogus::Product< JType, bogus::Transpose< JType > > Prod ; // Or use c++11 to infer the correct type
+  using JType = bogus::SparseBlockMatrix< BlockType >;
+  using Prod = bogus::Product< JType, bogus::Transpose< JType > >; // Or use c++11 to infer the correct type
   Prod W = J * J.transpose() ;
 
   bogus::ProjectedGradient< Prod > pg( W ) ;

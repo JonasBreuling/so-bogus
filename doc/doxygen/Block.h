@@ -166,7 +166,7 @@ using the SparseBlockMatrixBase::innerIterator() method. For instance,
 the contents of a row-major matrix can be read as follow
 
 \code
-typedef bogus::SparseBlockMatrix< Eigen::MatrixXd > SBM ;
+using SBM = bogus::SparseBlockMatrix< Eigen::MatrixXd >;
 SBM sbm ;
 
 //...
@@ -304,9 +304,8 @@ In certain situations, one may not know at compile time the number of
 operations that define an expression. For such scenarios, bogus defines the \ref NarySum expression. For instance, if we
 want to use to use the expression \f$ H H^T + \sum_i{ a_i J_i M_i J_i^T } \f$ as a system matrix, we can do \code
 // Common type for each of the sum's operands
-typedef bogus::Product< JType,
-                  bogus::Product< MType, bogus::Transpose< JType > > >
-                  JMJtProd ;
+using JMJtProd = bogus::Product< JType,
+                  bogus::Product< MType, bogus::Transpose< JType > > > ;
 
 // Construct n-ary sum expression
 // The (common) number of rows and columns of the operands has to be provided beforehand, in order to allow empty sum
@@ -315,8 +314,8 @@ JType &J = Jmatrices[i] ; sum += a[i] * ( J * ( Mmatrices[i] * J.transpose() ) )
 }
 
 // Construct global expression
-typedef bogus::Product< HType, bogus::Transpose< HType > > HHtProd ;
-typedef bogus::Addition< HHtProd, bogus::NarySum< JMJtProd > > Expr ;
+using HHtProd = bogus::Product< HType, bogus::Transpose< HType > >;
+using Expr = bogus::Addition< HHtProd, bogus::NarySum< JMJtProd > >;
 
 const Expr W = H * H.transpose() + sum ;
 

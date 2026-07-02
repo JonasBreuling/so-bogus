@@ -13,7 +13,7 @@
 
 class SmallSBM : public ::testing::Test {
  protected:
-  virtual void SetUp() {
+  void SetUp() override {
     // Eigen::initParallel()
     Eigen::MatrixXf A = Eigen::MatrixXf::Zero(1, 1);
     A = A * A;
@@ -44,8 +44,8 @@ class SmallSBM : public ::testing::Test {
     ASSERT_EQ(sbm.InvalidBlockPtr, sbm.blockPtr(1, 1));
   }
 
-  typedef Eigen::MatrixXd BlockT;
-  typedef bogus::SparseBlockMatrix<BlockT, bogus::flags::UNCOMPRESSED> SBMT;
+  using BlockT = Eigen::MatrixXd;
+  using SBMT = bogus::SparseBlockMatrix<BlockT, bogus::flags::UNCOMPRESSED>;
   SBMT sbm;
   Eigen::VectorXd rhs;
 
@@ -301,7 +301,7 @@ TEST(BlockMV, ColMajor) {
   Eigen::RowVectorXd expected_2(8);
   expected_2 << 6, 4, 2, 12, 21, 17, 13, 51;
 
-  typedef Eigen::MatrixXd BlockT;
+  using BlockT = Eigen::MatrixXd;
   bogus::SparseBlockMatrix<BlockT, bogus::flags::COL_MAJOR> sbm;
   sbm.setRows(4, 3);
   sbm.setCols(2, 4);
@@ -381,10 +381,10 @@ TEST_F(SmallSBM, RowMultiply) {
   res.setZero();
   res2.setZero();
 
-  typedef bogus::Segmenter<bogus::internal::DYNAMIC, Eigen::VectorXd, SBMT::Index> SegmenterType;
+  using SegmenterType = bogus::Segmenter<bogus::internal::DYNAMIC, Eigen::VectorXd, SBMT::Index>;
   SegmenterType resSeg(res, sbm.rowOffsets()), rhsSeg(rhs, sbm.colOffsets());
 
-  typedef SegmenterType::ReturnType Seg;
+  using Seg = SegmenterType::ReturnType;
   for (int i = 0; i < sbm.rowsOfBlocks(); ++i) {
     Seg seg = resSeg[i];
     sbm.rowMultiply<false>(i, rhs, seg);
@@ -416,8 +416,8 @@ TEST_F(SmallSBM, RowMultiply) {
 }
 
 TEST_F(SmallSBM, Compound) {
-  typedef Eigen::Matrix<double, 3, 3> OBlockT;
-  typedef bogus::SparseBlockMatrix<OBlockT> OSBMT;
+  using OBlockT = Eigen::Matrix<double, 3, 3>;
+  using OSBMT = bogus::SparseBlockMatrix<OBlockT>;
 
   OSBMT osbm;
   osbm.setRows(5);
@@ -452,10 +452,10 @@ TEST_F(SmallSBM, Compound) {
   res.setZero();
   Eigen::VectorXd res2 = res;
 
-  typedef bogus::Segmenter<bogus::internal::DYNAMIC, Eigen::VectorXd, SBMT::Index> SegmenterType;
+  using SegmenterType = bogus::Segmenter<bogus::internal::DYNAMIC, Eigen::VectorXd, SBMT::Index>;
   SegmenterType resSeg(res, comp.rowOffsets()), rhsSeg(rhs, comp.colOffsets());
 
-  typedef SegmenterType::ReturnType Seg;
+  using Seg = SegmenterType::ReturnType;
   for (int i = 0; i < comp.rowsOfBlocks(); ++i) {
     Seg seg = resSeg[i];
     comp.rowMultiply<false>(i, rhs, seg);
@@ -484,8 +484,8 @@ TEST_F(SmallSBM, Compound) {
 }
 
 TEST_F(SmallSBM, CompoundRow) {
-  typedef Eigen::Matrix<double, 4, 4> OBlockT;
-  typedef bogus::SparseBlockMatrix<OBlockT> OSBMT;
+  using OBlockT = Eigen::Matrix<double, 4, 4>;
+  using OSBMT = bogus::SparseBlockMatrix<OBlockT>;
 
   OSBMT osbm;
   osbm.setRows(3);
@@ -521,10 +521,10 @@ TEST_F(SmallSBM, CompoundRow) {
   res.setZero(comp.rows());
   Eigen::VectorXd res2 = res;
 
-  typedef bogus::Segmenter<bogus::internal::DYNAMIC, Eigen::VectorXd, SBMT::Index> SegmenterType;
+  using SegmenterType = bogus::Segmenter<bogus::internal::DYNAMIC, Eigen::VectorXd, SBMT::Index>;
   SegmenterType resSeg(res, comp.rowOffsets()), rhsSeg(rhs, comp.colOffsets());
 
-  typedef SegmenterType::ReturnType Seg;
+  using Seg = SegmenterType::ReturnType;
   for (int i = 0; i < comp.rowsOfBlocks(); ++i) {
     Seg seg = resSeg[i];
     comp.rowMultiply<false>(i, rhs, seg);

@@ -15,7 +15,7 @@
 
 class SmallFrictionPb : public ::testing::Test {
  protected:
-  virtual void SetUp() {
+  void SetUp() override {
     const unsigned dofs[2] = {4, 2};
 
     MassMat.setRows(2, dofs);
@@ -66,9 +66,9 @@ class SmallFrictionPb : public ::testing::Test {
     sol << 0.0152695, 0.0073010, 0.0022325, 0.0, 0.0, 0.0;
   }
 
-  typedef bogus::SparseBlockMatrix<Eigen::MatrixXd, bogus::UNCOMPRESSED> MType;
-  typedef Eigen::Matrix<double, 3, Eigen::Dynamic> GradBlockT;
-  typedef bogus::SparseBlockMatrix<GradBlockT> HType;
+  using MType = bogus::SparseBlockMatrix<Eigen::MatrixXd, bogus::UNCOMPRESSED>;
+  using GradBlockT = Eigen::Matrix<double, 3, Eigen::Dynamic>;
+  using HType = bogus::SparseBlockMatrix<GradBlockT>;
 
   MType MassMat;
   MType InvMassMat;

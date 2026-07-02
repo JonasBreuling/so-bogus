@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 TEST(Map, SparseBlock) {
-  typedef Eigen::Matrix<double, 3, 4> BlockT;
+  using BlockT = Eigen::Matrix<double, 3, 4>;
 
   bogus::MappedSparseBlockMatrix<BlockT> sbm;
 

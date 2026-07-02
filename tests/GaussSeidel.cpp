@@ -23,7 +23,7 @@ TEST_F(SmallFrictionPb, GaussSeidel) {
 
   Eigen::VectorXd b = w - H * (InvMassMat * f);
 
-  typedef bogus::SparseBlockMatrix<Eigen::Matrix3d, bogus::flags::SYMMETRIC> WType;
+  using WType = bogus::SparseBlockMatrix<Eigen::Matrix3d, bogus::flags::SYMMETRIC>;
   WType W;
   W = H * InvMassMat * H.transpose();
 
@@ -67,7 +67,7 @@ TEST_F(SmallFrictionPb, GaussSeidel) {
 TEST(GaussSeidel, LCP) {
   ResidualInfo ri;
 
-  typedef Eigen::Matrix<double, 1, 3> GradBlockT;
+  using GradBlockT = Eigen::Matrix<double, 1, 3>;
   bogus::SparseBlockMatrix<GradBlockT> H;
 
   H.setRows(4);
@@ -87,8 +87,8 @@ TEST(GaussSeidel, LCP) {
   Eigen::VectorXd b = H * k;
 
   {
-    typedef Eigen::Matrix<double, 1, 1> WBlockT;
-    typedef bogus::SparseBlockMatrix<WBlockT, bogus::SYMMETRIC> WType;
+    using WBlockT = Eigen::Matrix<double, 1, 1>;
+    using WType = bogus::SparseBlockMatrix<WBlockT, bogus::SYMMETRIC>;
 
     WType W = H * H.transpose();
 
@@ -110,8 +110,8 @@ TEST(GaussSeidel, LCP) {
   }
 
   {
-    typedef double WBlockT;
-    typedef bogus::SparseBlockMatrix<WBlockT, bogus::SYMMETRIC> WType;
+    using WBlockT = double;
+    using WType = bogus::SparseBlockMatrix<WBlockT, bogus::SYMMETRIC>;
 
     WType W = H * H.transpose();
 
